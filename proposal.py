@@ -104,7 +104,6 @@ with open("train.csv") as train:
 	for line in train: 
 		lineList = [d.strip() for d in line.split(',')]
 		T, X, Y, Z, ID = lineList[0], lineList[1], lineList[2], lineList[3], lineList[4]
-		#if "e" in T: T = convertT(T)
 		if prevID is None or ID != prevID:
 			numIDs += 1
 			if numIDs > MAX_NUM_IDS: break 
