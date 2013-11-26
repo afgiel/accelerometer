@@ -1,7 +1,7 @@
 
 import preProcess
 import stepDetection
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 class Device:
 	"""
@@ -85,7 +85,7 @@ class Device:
 			cl = stepDetection.getAverageCycleLength(seq)
 			minVal = stepDetection.getEstimateOfMin(seq, cl)
 			si = stepDetection.getStartIndex(seq, cl)
-			stepDetection.detectAllCycles(self.cycles, seq, cl, minVal, si)
+			# stepDetection.detectAllCycles(self.cycles, seq, cl, minVal, si)
 
 
 	def averageCycles(self):
