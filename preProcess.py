@@ -1,8 +1,17 @@
+
+import math
+
 I_TIME = 0
 I_X = 1
 I_Y = 2
 I_Z = 3
 I_ID = 4
+
+
+def resultantAcceleration(T, X, Y, Z):
+	return T, math.sqrt(X**2 + Y**2 + Z**2)
+
+
 
 #a = a_0 + (t_1 - t_0)*((a_1 - a_0)/(t_1 - t_0))
 def linearInterpolation(interval, dataList):
@@ -14,7 +23,7 @@ def linearInterpolation(interval, dataList):
 	toReturn.append(tuple(first))
 	prev = first
 	lastAddedT = first[I_TIME]
-	for T, X, Y, Z, ID in dataList:
+	for T, X in dataList:
 		T = T - firstTime
 		diff = T - lastAddedT
 		numToAdd = diff//interval
@@ -23,12 +32,44 @@ def linearInterpolation(interval, dataList):
 			TminusT0 = newT - prev[I_TIME]
 			T1minusT0 = T - prev[I_TIME]
 			X1minusX0 = X - prev[I_X]
-			Y1minusY0 = Y - prev[I_Y]
-			Z1minusZ0 = Z - prev[I_Z]
 			newX = prev[I_X] + TminusT0*(X1minusX0/T1minusT0)
-			newY = prev[I_Y] + TminusT0*(Y1minusY0/T1minusT0)
-			newZ = prev[I_Z] + TminusT0*(Z1minusZ0/T1minusT0)
-			toAdd = (newT, newX, newY, newZ, ID)
+			toAdd = (newT, newX)
 			toReturn.append(toAdd)
 			lastAddedT = newT
 	return toReturn
+
+
+
+
+# Modifies dataList in place
+# a_t = (a_{t-2} + a_{t-1} + a_{t} + a_{t+1} + a_{t+2})/5
+def MovingAverage(dataList, window):
+	dataSize = len(dataList)
+	numPoints = window * 2 + 1
+	currentIndex = window
+	while(currentIndex + window < dataSize):
+		total = 0
+		for i in xrange(window):
+			total += dataList[currentIndex - window + i]
+			total += dataList[currentIndex + window - i]
+		total += dataList[currentIndex]
+		dataList[currentIndex] = total / numPoints
+		currentIndex += 1
+
+
+
+# Modifies datalist in place
+# a_t = (a_{t-2}*1 + a_{t-1}*2 + a_{t}*3 + a_{t+1}*2 + a_{t+2}*1)/9
+def WeightedMovingAverage(dataList, window):
+	dataSize = len(dataList)
+	numPoints = (window + 1) ** 2
+	currentIndex = window
+	while(currentIndex + window < dataSize):
+		total = 0
+		for i in xrange(window):
+			total += dataList[currentIndex - window + i][1]*(i+1)
+			total += dataList[currentIndex + window - i][1]*(i+1)
+		total += dataList[currentIndex][1] * (window + 1)
+		dataList[currentIndex] =  (dataList[currentIndex][0],(total / numPoints))
+		currentIndex += 1
+
