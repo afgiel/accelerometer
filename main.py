@@ -18,12 +18,12 @@ import argparse
 interval = 100
 DEVICE_INDEX = 4
 
-def createTemplate(file, numDevices, toPlot, verbose):
+def createTemplate(filename, numDevices, toPlot, verbose):
 	if verbose:
 		print("Training templates...")
 		print
 	deviceList = list()
-	with open(file) as trainData:
+	with open(filename) as trainData:
 		next(trainData)
 		trainReader = csv.reader(trainData)
 		lastIDRead = -1
@@ -79,14 +79,78 @@ def createTemplate(file, numDevices, toPlot, verbose):
 	if toPlot:
 		deviceList[0].plotData()
 
+def createSequenceTemplate(testFilename, numSequences,verbose):
+	if verbose:
+		print "Reading Test Sequences..."
+		print 
+	sequenceList = list()
+	with open(testFilename) as testData:
+		next(testData)
+		testReader = csv.reader(testData)
+		lastSIDRead = -1
+		sequenceIndex = -1
+		for sample in testReader:
+			currentSequence = int(sample[4])
+			if currentSequence != lastSIDRead:
+				if (len(sequenceList)+ 1 > numSequences):
+					break
+				if verbose:
+					print "	Reading sequence ", str(currentSequence)+ "..."
+				sequenceIndex += 1
+				sequenceList.append(device.Device(currentSequence))
+				lastSIDRead = currentSequence
+			sequenceList[sequenceIndex].addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
+	if verbose:
+		print "	------Reading Complete------"
+		print
+
+	for s in sequenceList:
+		if verbose:
+			print "	Preprocessing data from sequence", str(s.ID) + "..."
+		s.preProcessData()
+	if verbose:
+		print "	------Preprocessing Complete------"
+		print
 
 
 
-def authenticate():
+	for s in sequenceList:
+		if verbose:
+			print "	Detecting cycles from sequence", str(s.ID) + "..."
+		s.detectCycles()
+	if verbose:
+		print "	------Cycle Detection Complete------"
+		print
+
+
+
+	for s in sequenceList:
+		if verbose:
+			print "	Averaging cycles from sequence", str(s.ID) + "..."
+		s.averageCycles()
+	if verbose:
+		print "	------Templates Created------"
+		print
+
+
+def authenticate(questionFilename, numQuestions, verbose):
 	if verbose:
 		print "Authenticating..."
-	return
-
+		print 
+		print "Reading Questions..."
+		print 
+	questionList = list()
+	with open(questionFilename) as questionData:
+		next(questionData)
+		questionReader = csv.reader(questionData)
+		for question in questionReader:
+			qID, sID, dID = question
+			if (len(questionList)+ 1 > numQuestions):
+				break
+			if verbose:
+				print "	Reading device ", str(qID)+ "..."
+			questionList.append((qId, sID, dID))
+	#go through questions and authenticate them 
 
 
 
