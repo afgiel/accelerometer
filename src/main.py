@@ -11,12 +11,17 @@ import csv
 import stepDetection
 import device
 import argparse
+import authentication
 
+RAW_DATA_PATH = "../data/raw/"
+SEQ_TEMP_PATH = "../data/sequence_templates/"
+DEV_TEMP_PATH = "../data/device_templates/"
+DEV_DEV_PATH = "../data/device_dev/"
 
 # Create template
 
 interval = 100
-DEVICE_INDEX = 4
+
 
 def createTemplate(filename, numDevices, toPlot, verbose):
 	if verbose:
@@ -29,7 +34,7 @@ def createTemplate(filename, numDevices, toPlot, verbose):
 		lastIDRead = -1
 		deviceIndex = -1
 		for sample in trainReader:
-			currentDevice = int(sample[DEVICE_INDEX])
+			currentDevice = int(sample[4])
 			if currentDevice != lastIDRead:
 				if (len(deviceList)+ 1 > numDevices):
 					break
@@ -71,10 +76,25 @@ def createTemplate(filename, numDevices, toPlot, verbose):
 		d.averageCycles()
 	if verbose:
 		print "	------Templates Created------"
-		print # Empty line
+		print
 
+	for d in deviceList:
+		if verbose:
+			print "	Writing template to file for device", str(d.ID) + "..."
+		with open(DEV_TEMP_PATH + "d_" + str(d.ID) + ".txt", "w") as templateFile:
+			toWrite = str(d.averageCycle)
+			templateFile.write(toWrite)
+	if verbose:
+		print "	------Templates Written------"
 
-
+	for d in deviceList:
+		if verbose:
+			print "	Writing develepment score to file for device", str(d.ID) + "..."
+		with open(DEV_DEV_PATH + "d_" + str(d.ID) + ".txt", "w") as devFile:
+			toWrite = str(d.averageDevScore)
+			devFile.write(toWrite)
+	if verbose:
+		print "	------Development Score Written------"
 
 	if toPlot:
 		deviceList[0].plotData()
@@ -132,6 +152,15 @@ def createSequenceTemplate(testFilename, numSequences,verbose):
 		print "	------Templates Created------"
 		print
 
+	for s in sequenceList:
+		if verbose:
+			print "	Writing template to file for sequence", str(s.ID) + "..."
+		with open(SEQ_TEMP_PATH + "s_" + str(s.ID) + ".txt", "w") as templateFile:
+			toWrite = str(s.averageCycle)
+			templateFile.write(toWrite)
+	if verbose:
+		print "	------Templates Written------"
+
 
 def authenticate(questionFilename, numQuestions, verbose):
 	if verbose:
@@ -150,7 +179,11 @@ def authenticate(questionFilename, numQuestions, verbose):
 			if verbose:
 				print "	Reading device ", str(qID)+ "..."
 			questionList.append((qId, sID, dID))
-	#go through questions and authenticate them 
+	answers = list()
+	for question in questionList:
+		prediction = authentication.authenticate(question)
+		answers.append((question[0], prediction))
+	#write our answers list
 
 
 
@@ -174,7 +207,7 @@ if args.action == "train":
 	createTemplate(args.TDfile, args.numD, args.plot, args.verbose)
 elif args.action == "authenticate":
 	authenticate()
-else: # Both 
+else:
 	createTemplate(args.TDfile, args.numD, args.plot, args.verbose)
 	authenticate()
 
