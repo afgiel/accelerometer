@@ -16,7 +16,7 @@ import argparse
 # Create template
 
 interval = 100
-
+DEVICE_INDEX = 4
 
 def createTemplate(file, numDevices, toPlot, verbose):
 	if verbose:
@@ -29,7 +29,7 @@ def createTemplate(file, numDevices, toPlot, verbose):
 		lastIDRead = -1
 		deviceIndex = -1
 		for sample in trainReader:
-			currentDevice = int(sample[4])
+			currentDevice = int(sample[DEVICE_INDEX])
 			if currentDevice != lastIDRead:
 				if (len(deviceList)+ 1 > numDevices):
 					break
@@ -71,7 +71,7 @@ def createTemplate(file, numDevices, toPlot, verbose):
 		d.averageCycles()
 	if verbose:
 		print "	------Templates Created------"
-		print
+		print # Empty line
 
 
 
@@ -110,7 +110,7 @@ if args.action == "train":
 	createTemplate(args.TDfile, args.numD, args.plot, args.verbose)
 elif args.action == "authenticate":
 	authenticate()
-else:
+else: # Both 
 	createTemplate(args.TDfile, args.numD, args.plot, args.verbose)
 	authenticate()
 

@@ -8,13 +8,10 @@ class Device:
 	Class that stores all the information to create a
 	template.
 
-	Note: avgTime should be passed in as float
 
 	Considerations:
 	Adding more stats on read in data such as average dt
 
-
-	Edge case: last cycle sequence smaller than minSamples
 	"""
 
 	def __init__(self, deviceID, lowDT = 120, highDT = 320, minSamples = 150):
@@ -37,7 +34,17 @@ class Device:
 
 	def addSample(self, time, x, y, z):
 		"""
-
+		Takes in a time, x acceleration, y acc., z acc. tuple
+		and adds it to the current sequence of readings if the following
+		condition is met:
+			-The change in time from the last reading falls within the range
+			of expected time differences
+		If the condition is not met, if there are enough samples in the current
+		sequence to accurately to get a cycle template then the old sequence is
+		kept and a new sequence will begin upon the next added sample.  If there
+		are not enough samples in the current sequence, then the current sequence
+		is scrapped and a new one will begin upond the next added sample.
+		When the sample is added, the resultant acceleration is automatically found.
 		"""
 		if self.prevTime != None:
 			dt = abs(time - self.prevTime)
@@ -57,9 +64,11 @@ class Device:
 		"""
 
 		"""
-
+		#Takes care of edge case where the last sequence is not
+		#large enough to accurately create a template.
 		if len(self.rawData[self.currIdx]) < self.minSamples:
 			self.rawData.pop(self.currIdx)
+
 		for idx, seq in enumerate(self.rawData):
 			self.processedData.append(preProcess.linearInterpolation(interval, seq))
 			preProcess.WeightedMovingAverage(self.processedData[idx], window)

@@ -1,4 +1,19 @@
 
+# Helper Functions
+
+def getDifferenceSumPointPair(dataList, samplesInBaseline, currPoint, basePoint):
+	diffSum = sum([abs(dataList[basePoint+n][1] - dataList[currPoint+n][1]) for n in xrange(samplesInBaseline)]))
+	pair = (currPoint, diffSum)
+	return pair
+
+def getIndexOfLocalMax(dataList, basePoint, cycleLength):
+	return max([(n, dataList[n][1]) for n in xrange(basePoint-int(cycleLength)/2, basePoint+int(cycleLength)/2)], key = lambda x: x[1])[0]
+
+
+
+
+
+
 
 def getAverageCycleLength(dataList, samplesInBaseline = 70, searchArea = 120):
 	basePoint = len(dataList)/2
@@ -6,18 +21,19 @@ def getAverageCycleLength(dataList, samplesInBaseline = 70, searchArea = 120):
 	diffsF = []
 	currPoint = basePoint + samplesInBaseline
 	for x in xrange(searchArea):
-		diffsF.append((currPoint, sum([abs(dataList[basePoint+n][1] - dataList[currPoint+n][1]) for n in xrange(samplesInBaseline)])))
+		diffsF.append(getDifferenceSumPointPair(dataList, samplesInBaseline, currPoint, basePoint))
 		currPoint += 1
 	# Backwards
 	diffsB = []
 	currPoint = basePoint - samplesInBaseline
 	for x in xrange(searchArea):
-		diffsB.append((currPoint, sum([abs(dataList[basePoint+n][1] - dataList[currPoint+n][1]) for n in xrange(samplesInBaseline)])))
+		diffsF.append(getDifferenceSumPointPair(dataList, samplesInBaseline, currPoint, basePoint))
 		currPoint -= 1
-
 	avgF = min(diffsF, key = lambda x: x[1])[0] - basePoint
 	avgB = basePoint - min(diffsB, key = lambda x: x[1])[0]
 	return (avgB + avgF)/2.0
+
+
 
 
 
@@ -28,71 +44,73 @@ def getEstimateOfMin(dataList, cycleLength):
 
 def getStartIndex(dataList, cycleLength):
 	basePoint = len(dataList)/2
-	pf = 0
-	pb = 0
-	maxp = max([(n, dataList[n][1]) for n in xrange(basePoint-int(cycleLength), basePoint+int(cycleLength))], key = lambda x: x[1])[0]
+	pointsForward = 0
+	pointsBackward = 0
+	maxPIdx = getIndexOfLocalMax(dataList, basePoint, cycleLength)
+
 	#Check one
-	maxb = max([(n, dataList[n][1]) for n in xrange(maxp-int(.66 *cycleLength), maxp)], key = lambda x: x[1])[0]
-	maxf = max([(n, dataList[n][1]) for n in xrange(maxp+3, maxp+int(.66*cycleLength))], key = lambda x: x[1])[0]
-	if maxp - maxb < maxf - maxp:
-		pb += 1
+	maxbIdx = max([(n, dataList[n][1]) for n in xrange(maxp-int(.66 *cycleLength), maxp-3)], key = lambda x: x[1])[0]
+	maxfIdx = max([(n, dataList[n][1]) for n in xrange(maxp+3, maxp+int(.66*cycleLength))], key = lambda x: x[1])[0]
+	if maxPIdx - maxbIdx < maxfIdx - maxPIdx:
+		pointsBackward += 1
 	else:
-		pf +=1
+		pointsForward +=1
+
 	#Check two
-	minb = min([(n, dataList[n][1]) for n in xrange(maxb, maxp)], key = lambda x: x[1])
-	minf = min([(n, dataList[n][1]) for n in xrange(maxp, maxf)], key = lambda x: x[1])
-	if minb[1] < minf[1]:
-		pb += 1
+	minBackIdxValPair = min([(n, dataList[n][1]) for n in xrange(maxbIdx, maxPIdx)], key = lambda x: x[1])
+	minForwIdxValPair = min([(n, dataList[n][1]) for n in xrange(maxPIdx, maxfIdx)], key = lambda x: x[1])
+	if minBackIdxValPair[1] < minForwIdxValPair[1]:
+		pointsBackward += 1
 	else:
-		pf += 1
+		pointsForward += 1
+
 	#Check three
-	locMaxB = 0
-	locMaxF = 0
-	prev2 = minb[1]
-	prev1 = dataList[minb[0]+1][1]
-	curr = dataList[minb[0]+2][1]
-	for n in xrange(minb[0]+3, maxp):
+	numLocMaxB = 0
+	numLocMaxF = 0
+	prev2 = minBackIdxValPair[1]
+	prev1 = dataList[minBackIdxValPair[0]+1][1]
+	curr = dataList[minBackIdxValPair[0]+2][1]
+	for n in xrange(minBackIdxValPair[0]+3, maxPIdx):
 		if prev1 > prev2 and prev1 > curr:
-			locMaxB+=1
+			numLocMaxB+=1
 		prev2 = prev1
 		prev1 = curr
 		curr = dataList[n][1]
 
-	prev2 = dataList[maxp][1]
-	prev1 = dataList[maxp+1][1]
-	curr = dataList[maxp+2][1]
-	for n in xrange(maxp+3, minf[0]):
+	prev2 = dataList[maxPIdx][1]
+	prev1 = dataList[maxPIdx+1][1]
+	curr = dataList[maxPIdx+2][1]
+	for n in xrange(maxPIdx+3, minForwIdxValPair[0]):
 		if prev1 > prev2 and prev1 > curr:
-			locMaxF+=1
+			numLocMaxF+=1
 		prev2 = prev1
 		prev1 = curr
 		curr = dataList[n][1]
 
-
-	if locMaxB < locMaxF:
-		pb += 1
+	if numLocMaxB < numLocMaxF:
+		pointsBackward += 1
 	else:
-		pf += 1
+		pointsForward += 1
 
 	#Check four
-	db = maxp - minb[0]
-	df = minf[0] - maxp
+	db = maxPIdx - minBackIdxValPair[0]
+	df = minForwIdxValPair[0] - maxPIdx
 
 	if db < 10 or df < 10:
-		if db <10:
+		if db < 10:
 			pf += 1
 		if df < 10:
 			pb +=1
 	else:
 		if db < df:
-			pb +=1
+			pointsBackward +=1
 		else:
-			pf +=1
+			pointsForward +=1
 
-	if pf < pb:
-		return minb[0]
+	if pointsForward < pointsBackward:
+		return minBackIdxValPair[0]
 	else:
-		return minf[0]
+		return minForwIdxValPair[0]
 
 
 
