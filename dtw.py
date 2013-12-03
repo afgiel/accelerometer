@@ -1,5 +1,7 @@
 import numpy as np
 
+W = 10
+
 def getDTW(A, B):
 	aLen = len(A)
 	bLen = len(B)
@@ -14,7 +16,7 @@ def getDTW(A, B):
 
 	for i in xrange(1, aLen):
 		minCosts = []
-		for j in xrange(1, bLen):
+		for j in xrange(max(1, i-W), min(bLen, i+W)):
 			cost = abs(A[i] - B[j])
 			minEditCost = min([DTW[i-1][j], DTW[i][j-1], DTW[i-1][j-1]])
 			DTW[i][j] = cost + minEditCost

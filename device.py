@@ -2,6 +2,7 @@
 import preProcess
 import stepDetection
 # import matplotlib.pyplot as plt
+import numpy
 
 class Device:
 	"""
@@ -89,8 +90,34 @@ class Device:
 
 
 	def averageCycles(self):
-		return
+		totalDistances = list()
+		devScores = dict()
+		for idx, cycle in enumerate(self.cycles):
+			devScores[idx] = list()
+			distanceScore = 0.0
+			for toCompare in self.cycles:
+				if cycle != toCompare:
+					indivScore, indivDev = dtw.getDTW(cycle, toCompare)
+					distanceScore += indivScore
+					devScores[idx].append(indivDev)
+			totalDistances.append((idx, distanceScore))
+		choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
+		self.averageCycle = self.cycles[choiceIdx]
+		devAgainstAvg = devScores[choiceIdx]
+		averageDevAgainstTemplate(devAgainstAvg)
 
+	def averageDevAgainstTemplate(self, devScores):
+		avgDevScore = list()
+		allScores = list()
+		for devScore in devScores:
+			for idx, score in enumerate(devScore):
+				if allScores[idx] is None:
+					allScores[idx] = list()
+				allScores[idx].append(score)
+		for indexScore in allScores:
+			avgForIndex = numpy.mean(indexScore)
+			avgDevScore.append(avgForIndex)
+		self.averageDevScore = avgDevScore
 
 		
 
