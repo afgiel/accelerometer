@@ -102,15 +102,21 @@ class Device:
 	def averageCycles(self):
 		totalDistances = list()
 		devScores = dict()
-		for idx, cycle in enumerate(self.cycles):
-			devScores[idx] = list()
+		precomputed = dict()
+		for idx1, cycle in enumerate(self.cycles):
+			devScores[idx1] = list()
 			distanceScore = 0.0
-			for toCompare in self.cycles:
-				if cycle != toCompare:
-					indivScore, indivDev = dtw.getDTW(cycle, toCompare)
+			for idx2, toCompare in enumerate(self.cycles):
+				if idx1 != idx2:
+					if (idx1, idx2) in precomputed:
+						indivScore, indivDev = precomputed[(idx1, idx2)]
+					else:
+						indivScore, indivDev = dtw.getDTW(cycle, toCompare)
+						precomputed[(idx1, idx2)] = (indivScore, indivDev)
+						precomputed[(idx2, idx1)] = (indivScore, indivDev)
 					distanceScore += indivScore
-					devScores[idx].append(indivDev)
-			totalDistances.append((idx, distanceScore))
+					devScores[idx1].append(indivDev)
+			totalDistances.append((idx1, distanceScore))
 		choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
 		self.averageCycle = self.cycles[choiceIdx]
 		devAgainstAvg = devScores[choiceIdx]
