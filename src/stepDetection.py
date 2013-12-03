@@ -2,7 +2,7 @@
 # Helper Functions
 
 def getDifferenceSumPointPair(dataList, samplesInBaseline, currPoint, basePoint):
-	diffSum = sum([abs(dataList[basePoint+n][1] - dataList[currPoint+n][1]) for n in xrange(samplesInBaseline)]))
+	diffSum = sum([abs(dataList[basePoint+n][1] - dataList[currPoint+n][1]) for n in xrange(samplesInBaseline)])
 	pair = (currPoint, diffSum)
 	return pair
 
@@ -27,7 +27,7 @@ def getAverageCycleLength(dataList, samplesInBaseline = 70, searchArea = 120):
 	diffsB = []
 	currPoint = basePoint - samplesInBaseline
 	for x in xrange(searchArea):
-		diffsF.append(getDifferenceSumPointPair(dataList, samplesInBaseline, currPoint, basePoint))
+		diffsB.append(getDifferenceSumPointPair(dataList, samplesInBaseline, currPoint, basePoint))
 		currPoint -= 1
 	avgF = min(diffsF, key = lambda x: x[1])[0] - basePoint
 	avgB = basePoint - min(diffsB, key = lambda x: x[1])[0]
@@ -49,8 +49,8 @@ def getStartIndex(dataList, cycleLength):
 	maxPIdx = getIndexOfLocalMax(dataList, basePoint, cycleLength)
 
 	#Check one
-	maxbIdx = max([(n, dataList[n][1]) for n in xrange(maxp-int(.66 *cycleLength), maxp-3)], key = lambda x: x[1])[0]
-	maxfIdx = max([(n, dataList[n][1]) for n in xrange(maxp+3, maxp+int(.66*cycleLength))], key = lambda x: x[1])[0]
+	maxbIdx = max([(n, dataList[n][1]) for n in xrange(maxPIdx-int(.66 *cycleLength), maxPIdx-3)], key = lambda x: x[1])[0]
+	maxfIdx = max([(n, dataList[n][1]) for n in xrange(maxPIdx+3, maxPIdx+int(.66*cycleLength))], key = lambda x: x[1])[0]
 	if maxPIdx - maxbIdx < maxfIdx - maxPIdx:
 		pointsBackward += 1
 	else:
@@ -98,9 +98,9 @@ def getStartIndex(dataList, cycleLength):
 
 	if db < 10 or df < 10:
 		if db < 10:
-			pf += 1
+			pointsForward += 1
 		if df < 10:
-			pb +=1
+			pointsBackward +=1
 	else:
 		if db < df:
 			pointsBackward +=1
@@ -114,86 +114,110 @@ def getStartIndex(dataList, cycleLength):
 
 
 
-def detectAllCycles(cycles, dataList, cycleLength, minVal, si):
+def detectAllCycles(cycles, dataList, cycleLength, minVal, startIndex):
 	lowBound = 2*int(cycleLength)
 	highBound = len(dataList) - 2*int(cycleLength)
-	baseidx = si
+	baseidx = startIndex
 	nextidx = baseidx + int(cycleLength)
 	while nextidx < highBound:
-		firstThird = min([(n, dataList[n][1]) for n in xrange(nextidx - int(cycleLength/10.0), nextidx - int(cycleLength/30.0))], key = lambda x: x[1])
-		midThird = min([(n, dataList[n][1]) for n in xrange(nextidx - int(cycleLength/30.0), nextidx + int(cycleLength/30.0))], key = lambda x: x[1])
-		lastThird = min([(n, dataList[n][1]) for n in xrange(nextidx + int(cycleLength/30.0), nextidx + int(cycleLength/10.0))], key = lambda x: x[1])
-		if midThird[1] < firstThird[1]:
-			if midThird[1] < lastThird[1]:
-				cycles.append([dataList[n] for n in xrange(baseidx, midThird[0]+1)])
-				baseidx = midThird[0]
+		firstThirdMin = min([(n, dataList[n][1]) for n in xrange(nextidx - int(cycleLength/10.0), nextidx - int(cycleLength/30.0))], key = lambda x: x[1])
+		midThirdMin = min([(n, dataList[n][1]) for n in xrange(nextidx - int(cycleLength/30.0), nextidx + int(cycleLength/30.0))], key = lambda x: x[1])
+		lastThirdMin = min([(n, dataList[n][1]) for n in xrange(nextidx + int(cycleLength/30.0), nextidx + int(cycleLength/10.0))], key = lambda x: x[1])
+		if midThirdMin[1] < firstThirdMin[1]:
+			if midThirdMin[1] < lastThirdMin[1]:
+				cycles.append([dataList[n] for n in xrange(baseidx, midThirdMin[0]+1)])
+				baseidx = midThirdMin[0]
 				nextidx = baseidx+ int(cycleLength)
 			else:
-				prevMin = lastThird
-				newMin = lastThird
-				while newMin[1] <= prevMin[1]:
+				prevMin = lastThirdMin
+				newMin = lastThirdMin
+				nextidx += int(cycleLength/10.0)
+				iterations = 0
+				while newMin[1] <= prevMin[1] and iterations < 3:
+					iterations += 1
 					prevMin = newMin
-					newMin = min([(n, dataList[n][1]) for n in xrange(prevMin[0]+1, prevMin[0]+1+int(cycleLength/20.0))], key = lambda x: x[1])
+					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx, nextidx + int(cycleLength/20.0))], key = lambda x: x[1])
+					nextidx += int(cycleLength/20.0)
 				cycles.append([dataList[n] for n in xrange(baseidx, prevMin[0]+1)])
 				baseidx = prevMin[0]
 				nextidx = baseidx + int(cycleLength)
 		else:
-			if firstThird[1] < lastThird[1]:
-				prevMin = firstThird
-				newMin = firstThird
-				while newMin[1] <= prevMin[1]:
+			if firstThirdMin[1] < lastThirdMin[1]:
+				prevMin = firstThirdMin
+				newMin = firstThirdMin
+				nextidx -= int(cycleLength/10.0)
+				iterations = 0
+				while newMin[1] <= prevMin[1] and iterations < 3:
+					iterations += 1
 					prevMin = newMin
-					newMin = min([(n, dataList[n][1]) for n in xrange(prevMin[0]-1-int(cycleLength/20.0), prevMin[0]-1)], key = lambda x: x[1])
+					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx-int(cycleLength/20.0), nextidx)], key = lambda x: x[1])
+					nextidx -= int(cycleLength/20.0)
 				cycles.append([dataList[n] for n in xrange(baseidx, prevMin[0]+1)])
 				baseidx = prevMin[0]
 				nextidx = baseidx + int(cycleLength)
 			else:
-				prevMin = lastThird
-				newMin = lastThird
-				while newMin[1] <= prevMin[1]:
+				prevMin = lastThirdMin
+				newMin = lastThirdMin
+				nextidx += int(cycleLength/10.0)
+				iterations = 0
+				while newMin[1] <= prevMin[1] and iterations < 3:
+					iterations += 1
 					prevMin = newMin
-					newMin = min([(n, dataList[n][1]) for n in xrange(prevMin[0]+1, prevMin[0]+1+int(cycleLength/20.0))], key = lambda x: x[1])
+					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx, nextidx + int(cycleLength/20.0))], key = lambda x: x[1])
+					nextidx += int(cycleLength/20.0)
 				cycles.append([dataList[n] for n in xrange(baseidx, prevMin[0]+1)])
 				baseidx = prevMin[0]
 				nextidx = baseidx + int(cycleLength)
 
 
-	baseidx = si
+	baseidx = startIndex
 	nextidx = baseidx - int(cycleLength)
 	while nextidx > lowBound:
-		firstThird = min([(n, dataList[n][1]) for n in xrange(nextidx - int(cycleLength/10.0), nextidx - int(cycleLength/30.0))], key = lambda x: x[1])
-		midThird = min([(n, dataList[n][1]) for n in xrange(nextidx - int(cycleLength/30.0), nextidx + int(cycleLength/30.0))], key = lambda x: x[1])
-		lastThird = min([(n, dataList[n][1]) for n in xrange(nextidx + int(cycleLength/30.0), nextidx + int(cycleLength/10.0))], key = lambda x: x[1])
-		if midThird[1] < firstThird[1]:
-			if midThird[1] < lastThird[1]:
-				cycles.append([dataList[n] for n in xrange(midThird[0], baseidx+1)])
-				baseidx = midThird[0]
+		firstThirdMin = min([(n, dataList[n][1]) for n in xrange(nextidx - int(cycleLength/10.0), nextidx - int(cycleLength/30.0))], key = lambda x: x[1])
+		midThirdMin = min([(n, dataList[n][1]) for n in xrange(nextidx - int(cycleLength/30.0), nextidx + int(cycleLength/30.0))], key = lambda x: x[1])
+		lastThirdMin = min([(n, dataList[n][1]) for n in xrange(nextidx + int(cycleLength/30.0), nextidx + int(cycleLength/10.0))], key = lambda x: x[1])
+		if midThirdMin[1] < firstThirdMin[1]:
+			if midThirdMin[1] < lastThirdMin[1]:
+				cycles.append([dataList[n] for n in xrange(midThirdMin[0], baseidx+1)])
+				baseidx = midThirdMin[0]
 				nextidx = baseidx - int(cycleLength)
 			else:
-				prevMin = lastThird
-				newMin = lastThird
-				while newMin[1] <= prevMin[1]:
+				prevMin = lastThirdMin
+				newMin = lastThirdMin
+				nextidx += int(cycleLength/10.0)
+				iterations = 0
+				while newMin[1] <= prevMin[1] and iterations < 3:
+					iterations += 1
 					prevMin = newMin
-					newMin = min([(n, dataList[n][1]) for n in xrange(prevMin[0]+1, prevMin[0]+1+int(cycleLength/20.0))], key = lambda x: x[1])
+					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx, nextidx + int(cycleLength/20.0))], key = lambda x: x[1])
+					nextidx += int(cycleLength/20.0)
 				cycles.append([dataList[n] for n in xrange(prevMin[0], baseidx+1)])
 				baseidx = prevMin[0]
 				nextidx = baseidx - int(cycleLength)
 		else:
-			if firstThird[1] < lastThird[1]:
-				prevMin = firstThird
-				newMin = firstThird
-				while newMin[1] <= prevMin[1]:
+			if firstThirdMin[1] < lastThirdMin[1]:
+				prevMin = firstThirdMin
+				newMin = firstThirdMin
+				nextidx -= int(cycleLength/10.0)
+				iterations = 0
+				while newMin[1] <= prevMin[1] and iterations < 3:
+					iterations += 1
 					prevMin = newMin
-					newMin = min([(n, dataList[n][1]) for n in xrange(prevMin[0]-1-int(cycleLength/20.0), prevMin[0]-1)], key = lambda x: x[1])
+					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx-int(cycleLength/20.0), nextidx)], key = lambda x: x[1])
+					nextidx -= int(cycleLength/20.0)
 				cycles.append([dataList[n] for n in xrange(prevMin[0], baseidx+1)])
 				baseidx = prevMin[0]
 				nextidx = baseidx - int(cycleLength)
 			else:
-				prevMin = lastThird
-				newMin = lastThird
-				while newMin[1] <= prevMin[1]:
+				prevMin = lastThirdMin
+				newMin = lastThirdMin
+				nextidx += int(cycleLength/10.0)
+				iterations = 0
+				while newMin[1] <= prevMin[1] and iterations < 3:
+					iterations += 1
 					prevMin = newMin
-					newMin = min([(n, dataList[n][1]) for n in xrange(prevMin[0]+1, prevMin[0]+1+int(cycleLength/20.0))], key = lambda x: x[1])
+					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx, nextidx + int(cycleLength/20.0))], key = lambda x: x[1])
+					nextidx += int(cycleLength/20.0)
 				cycles.append([dataList[n] for n in xrange(prevMin[0], baseidx+1)])
 				baseidx = prevMin[0]
 				nextidx = baseidx - int(cycleLength)
