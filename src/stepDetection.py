@@ -138,7 +138,9 @@ def detectAllCycles(cycles, dataList, cycleLength, minVal, startIndex):
 					prevMin = newMin
 					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx, nextidx + int(cycleLength/20.0))], key = lambda x: x[1])
 					nextidx += int(cycleLength/20.0)
-				cycles.append([dataList[n] for n in xrange(baseidx, prevMin[0]+1)])
+				cycle = [dataList[n] for n in xrange(baseidx, prevMin[0]+1)]
+				if len(cycle) > cycleLength - 10 and len(cycle) < cycleLength + 10:
+					cycles.append(cycle)
 				baseidx = prevMin[0]
 				nextidx = baseidx + int(cycleLength)
 		else:
@@ -152,7 +154,9 @@ def detectAllCycles(cycles, dataList, cycleLength, minVal, startIndex):
 					prevMin = newMin
 					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx-int(cycleLength/20.0), nextidx)], key = lambda x: x[1])
 					nextidx -= int(cycleLength/20.0)
-				cycles.append([dataList[n] for n in xrange(baseidx, prevMin[0]+1)])
+				cycle = [dataList[n] for n in xrange(baseidx, prevMin[0]+1)]
+				if len(cycle) > cycleLength - 10 and len(cycle) < cycleLength + 10:
+					cycles.append(cycle)
 				baseidx = prevMin[0]
 				nextidx = baseidx + int(cycleLength)
 			else:
@@ -165,7 +169,9 @@ def detectAllCycles(cycles, dataList, cycleLength, minVal, startIndex):
 					prevMin = newMin
 					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx, nextidx + int(cycleLength/20.0))], key = lambda x: x[1])
 					nextidx += int(cycleLength/20.0)
-				cycles.append([dataList[n] for n in xrange(baseidx, prevMin[0]+1)])
+				cycle = [dataList[n] for n in xrange(baseidx, prevMin[0]+1)]
+				if len(cycle) > cycleLength - 10 and len(cycle) < cycleLength + 10:
+					cycles.append(cycle)
 				baseidx = prevMin[0]
 				nextidx = baseidx + int(cycleLength)
 
@@ -191,7 +197,9 @@ def detectAllCycles(cycles, dataList, cycleLength, minVal, startIndex):
 					prevMin = newMin
 					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx, nextidx + int(cycleLength/20.0))], key = lambda x: x[1])
 					nextidx += int(cycleLength/20.0)
-				cycles.append([dataList[n] for n in xrange(prevMin[0], baseidx+1)])
+				cycle = [dataList[n] for n in xrange(prevMin[0], baseidx+1)]
+				if len(cycle) > cycleLength - 10 and len(cycle) < cycleLength + 10:
+					cycles.append(cycle)
 				baseidx = prevMin[0]
 				nextidx = baseidx - int(cycleLength)
 		else:
@@ -205,7 +213,9 @@ def detectAllCycles(cycles, dataList, cycleLength, minVal, startIndex):
 					prevMin = newMin
 					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx-int(cycleLength/20.0), nextidx)], key = lambda x: x[1])
 					nextidx -= int(cycleLength/20.0)
-				cycles.append([dataList[n] for n in xrange(prevMin[0], baseidx+1)])
+				cycle = [dataList[n] for n in xrange(prevMin[0], baseidx+1)]
+				if len(cycle) > cycleLength - 10 and len(cycle) < cycleLength + 10:
+					cycles.append(cycle)
 				baseidx = prevMin[0]
 				nextidx = baseidx - int(cycleLength)
 			else:
@@ -218,7 +228,9 @@ def detectAllCycles(cycles, dataList, cycleLength, minVal, startIndex):
 					prevMin = newMin
 					newMin = min([(n, dataList[n][1]) for n in xrange(nextidx, nextidx + int(cycleLength/20.0))], key = lambda x: x[1])
 					nextidx += int(cycleLength/20.0)
-				cycles.append([dataList[n] for n in xrange(prevMin[0], baseidx+1)])
+				cycle = [dataList[n] for n in xrange(prevMin[0], baseidx+1)]
+				if len(cycle) > cycleLength - 10 and len(cycle) < cycleLength + 10:
+					cycles.append(cycle)
 				baseidx = prevMin[0]
 				nextidx = baseidx - int(cycleLength)
 

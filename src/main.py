@@ -174,8 +174,8 @@ def authenticate(questionFilename, numQuestions, verbose):
 		questionReader = csv.reader(questionData)
 		for question in questionReader:
 			qID, sID, dID = question
-			if (len(questionList)+ 1 > numQuestions):
-				break
+			# if (len(questionList)+ 1 > numQuestions):
+			# 	break
 			if verbose:
 				print "	Reading device ", str(qID)+ "..."
 			questionList.append((qId, sID, dID))
@@ -183,7 +183,9 @@ def authenticate(questionFilename, numQuestions, verbose):
 	for question in questionList:
 		prediction = authentication.authenticate(question)
 		answers.append((question[0], prediction))
-	#write our answers list
+	with open("answers.crv", "w") as answerFile:
+		for answer in answers:
+			answerFile.write(str(answer[0]) + "," + str(answer[1]))
 
 
 
@@ -195,9 +197,9 @@ actions = ["train", "authenticate", "both"]
 booleans = [True, False]
 parser = argparse.ArgumentParser(description = 'Process average gait cycle from accelerometer readings and authenticate user')
 parser.add_argument("action", help = "train, authenticate, both", default = "train", choices = actions)
-parser.add_argument("--TDfile", help = "File where data to train authenticator is stored", default = "train1.csv")
+parser.add_argument("--TDfile", help = "File where data to train authenticator is stored", default = "../data/train.csv")
 parser.add_argument("--tempFile", help = "File where templates are stored")
-parser.add_argument("--numD", help = "Number of devices to create templates for", type = int, default = 1)
+parser.add_argument("--numD", help = "Number of devices to create templates for", type = int, default = 3)
 parser.add_argument("--plot", help = "Boolean indicating whether data should be plotted", default = False, choices= booleans, type = bool)
 parser.add_argument("--verbose", help = "Prints out logging info when true", choices = booleans, default = True)
 args = parser.parse_args()
@@ -209,7 +211,7 @@ elif args.action == "authenticate":
 	authenticate()
 else:
 	createTemplate(args.TDfile, args.numD, args.plot, args.verbose)
-	authenticate()
+	authenticate("../data/questions.csv", 90024, args.verbose)
 
 if args.verbose:
 	print "All Done!"
