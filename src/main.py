@@ -103,7 +103,7 @@ def createTemplate(filename, numDevices, toPlot, verbose):
 	if toPlot:
 		deviceList[0].plotData()
 
-def createSequenceTemplate(testFilename, numSequences,verbose):
+def createSequenceTemplate(testFilename, numSequences, verbose):
 	if verbose:
 		print "Reading Test Sequences..."
 		print 
@@ -160,7 +160,7 @@ def createSequenceTemplate(testFilename, numSequences,verbose):
 		if verbose:
 			print "	Writing template to file for sequence", str(s.ID) + "..."
 		with open(SEQ_TEMP_PATH + "s_" + str(s.ID) + ".txt", "w") as templateFile:
-			toWrite = str(s.averageCycle)
+			toWrite = str([x[1] for x in s.averageCycle])
 			templateFile.write(toWrite)
 	if verbose:
 		print "	------Templates Written------"
@@ -201,7 +201,8 @@ actions = ["train", "authenticate", "both"]
 booleans = [True, False]
 parser = argparse.ArgumentParser(description = 'Process average gait cycle from accelerometer readings and authenticate user')
 parser.add_argument("action", help = "train, authenticate, both", default = "train", choices = actions)
-parser.add_argument("--TDfile", help = "File where data to train authenticator is stored", default = "../data/raw/train.csv")
+parser.add_argument("--trainFile", help = "File where data to train authenticator is stored", default = "../data/raw/train.csv")
+parser.add_argument("--testFile", help = "File where data to create templates for tests is stored", default = "../data/raw/test.csv")
 parser.add_argument("--tempFile", help = "File where templates are stored")
 parser.add_argument("--numD", help = "Number of devices to create templates for", type = int, default = 400)
 parser.add_argument("--plot", help = "Boolean indicating whether data should be plotted", default = False, choices= booleans, type = bool)
@@ -210,9 +211,10 @@ args = parser.parse_args()
 
 
 if args.action == "train":
-	createTemplate(args.TDfile, args.numD, args.plot, args.verbose)
+	createTemplate(args.trainFile, args.numD, args.plot, args.verbose)
 elif args.action == "authenticate":
-	authenticate()
+	createSequenceTemplate(args.testFile, 90024, args.verbose)
+	authenticate("../data/questions.csv", 90024, args.verbose)
 else:
 	createTemplate(args.TDfile, args.numD, args.plot, args.verbose)
 	authenticate("../data/questions.csv", 90024, args.verbose)
