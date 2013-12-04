@@ -86,7 +86,7 @@ def createTemplate(filename, numDevices, toPlot, verbose):
 		if verbose:
 			print "	Writing template to file for device", str(d.ID) + "..."
 		with open(DEV_TEMP_PATH + "d_" + str(d.ID) + ".txt", "w") as templateFile:
-			toWrite = str(d.averageCycle)
+			toWrite = str([x[1] for x in d.averageCycle])
 			templateFile.write(toWrite)
 	if verbose:
 		print "	------Templates Written------"
