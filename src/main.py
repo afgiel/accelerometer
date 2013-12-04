@@ -68,7 +68,8 @@ def createTemplate(filename, numDevices, toPlot, verbose):
 		print "	------Cycle Detection Complete------"
 		print
 
-
+	for d in deviceList:
+		print str(d.ID), len(d.cycles)
 
 	for d in deviceList:
 		if verbose:
@@ -197,7 +198,7 @@ actions = ["train", "authenticate", "both"]
 booleans = [True, False]
 parser = argparse.ArgumentParser(description = 'Process average gait cycle from accelerometer readings and authenticate user')
 parser.add_argument("action", help = "train, authenticate, both", default = "train", choices = actions)
-parser.add_argument("--TDfile", help = "File where data to train authenticator is stored", default = "../data/train.csv")
+parser.add_argument("--TDfile", help = "File where data to train authenticator is stored", default = "../data/raw/train.csv")
 parser.add_argument("--tempFile", help = "File where templates are stored")
 parser.add_argument("--numD", help = "Number of devices to create templates for", type = int, default = 3)
 parser.add_argument("--plot", help = "Boolean indicating whether data should be plotted", default = False, choices= booleans, type = bool)
