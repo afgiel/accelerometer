@@ -104,12 +104,32 @@ class Device:
 			si = stepDetection.getStartIndex(seq, cl)
 			stepDetection.detectAllCycles(self.cycles, seq, cl, minVal, si)
 
+	def averageDevAgainstTemplate(self, devScores):
+		avgDevScore = list()
+		allScores = dict()
+		for devScore in devScores:
+			for idx, score in enumerate(devScore):
+				if idx not in allScores:
+					allScores[idx] = list()
+				allScores[idx].append(score)
+		for indexScore in allScores:
+			avgForIndex = numpy.mean(indexScore)
+			avgDevScore.append(avgForIndex)
+		self.averageDevScore = avgDevScore
+
+		
+
+
 
 	def averageCycles(self):
 		totalDistances = list()
 		devScores = dict()
 		precomputed = dict()
-		samples = random.sample(self.cycles, NUM_SAMPLES)
+		samples = list()
+		if len(self.cycles) < NUM_SAMPLES:
+			samples = self.cycles
+		else:
+			samples = random.sample(self.cycles, NUM_SAMPLES)
 		for idx1, cycle in enumerate(samples):
 			devScores[idx1] = list()
 			distanceScore = 0.0
@@ -127,21 +147,7 @@ class Device:
 		choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
 		self.averageCycle = self.cycles[choiceIdx]
 		devAgainstAvg = devScores[choiceIdx]
-		averageDevAgainstTemplate(devAgainstAvg)
+		self.averageDevAgainstTemplate(devAgainstAvg)
 
-	def averageDevAgainstTemplate(self, devScores):
-		avgDevScore = list()
-		allScores = list()
-		for devScore in devScores:
-			for idx, score in enumerate(devScore):
-				if allScores[idx] is None:
-					allScores[idx] = list()
-				allScores[idx].append(score)
-		for indexScore in allScores:
-			avgForIndex = numpy.mean(indexScore)
-			avgDevScore.append(avgForIndex)
-		self.averageDevScore = avgDevScore
-
-		
-
+	
 
