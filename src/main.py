@@ -204,7 +204,7 @@ parser.add_argument("action", help = "train, authenticate, both", default = "tra
 parser.add_argument("--trainFile", help = "File where data to train authenticator is stored", default = "../data/raw/train.csv")
 parser.add_argument("--testFile", help = "File where data to create templates for tests is stored", default = "../data/raw/test.csv")
 parser.add_argument("--tempFile", help = "File where templates are stored")
-parser.add_argument("--numD", help = "Number of devices to create templates for", type = int, default = 5)
+parser.add_argument("--numD", help = "Number of devices to create templates for", type = int, default = 400)
 parser.add_argument("--plot", help = "Boolean indicating whether data should be plotted", default = False, choices= booleans, type = bool)
 parser.add_argument("--verbose", help = "Prints out logging info when true", choices = booleans, default = True)
 args = parser.parse_args()
@@ -216,7 +216,7 @@ elif args.action == "authenticate":
 	createSequenceTemplate(args.testFile, 90024, args.verbose)
 	authenticate("../data/questions.csv", 90024, args.verbose)
 else:
-	createTemplate(args.TDfile, args.numD, args.plot, args.verbose)
+	createTemplate(args.trainFile, args.numD, args.plot, args.verbose)
 	authenticate("../data/questions.csv", 90024, args.verbose)
 
 if args.verbose:

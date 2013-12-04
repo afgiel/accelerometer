@@ -7,7 +7,7 @@ import collections
 import dtw
 import random
 
-NUM_SAMPLES = 100
+NUM_SAMPLES = 10
 
 
 def getTimeDifference(dataList):
