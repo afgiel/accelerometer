@@ -27,7 +27,7 @@ class Device:
 
 	"""
 
-	def __init__(self, deviceID, lowDT = 0.0, highDT = 320, minSampleTime = 20000):
+	def __init__(self, deviceID, lowDT = 0.0, highDT = 320, minSampleTime = 25000):
 		"""
 
 
@@ -43,6 +43,7 @@ class Device:
 		self.rawData.append(list())
 		self.processedData = list()
 		self.timeDifferences = collections.Counter()
+		self.numSamples = 0
 
 	
 
@@ -62,6 +63,7 @@ class Device:
 		is scrapped and a new one will begin upond the next added sample.
 		When the sample is added, the resultant acceleration is automatically found.
 		"""
+		self.numSamples += 1
 		if self.prevTime != None:
 			dt = abs(time - self.prevTime)
 			self.timeDifferences[dt] += 1
@@ -150,10 +152,16 @@ class Device:
 					distanceScore += indivScore
 					devScores[idx1].append(indivDev)
 			totalDistances.append((idx1, distanceScore))
-		choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
-		self.averageCycle = self.cycles[choiceIdx]
-		devAgainstAvg = devScores[choiceIdx]
-		self.averageDevAgainstTemplate(devAgainstAvg)
+		if len(samples) != 0:	
+			choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
+			self.averageCycle = self.cycles[choiceIdx]
+			devAgainstAvg = devScores[choiceIdx]
+			self.averageDevAgainstTemplate(devAgainstAvg)
+		else:
+			self.averageCycle = [(0, 0)]
+			self.averageDevAgainstTemplate =[(0,0)]
+			self.averageDevScore = 0
+
 
 	
 
