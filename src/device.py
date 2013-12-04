@@ -3,6 +3,7 @@ import preProcess
 import stepDetection
 # import matplotlib.pyplot as plt
 import numpy
+import collections
 import dtw
 
 class Device:
@@ -16,7 +17,7 @@ class Device:
 
 	"""
 
-	def __init__(self, deviceID, lowDT = 120, highDT = 320, minSamples = 150):
+	def __init__(self, deviceID, lowDT = 1, highDT = 320, minSamples = 150):
 		"""
 
 
@@ -31,6 +32,7 @@ class Device:
 		self.rawData = list()
 		self.rawData.append(list())
 		self.processedData = list()
+		self.timeDifferences = collections.Counter()
 
 
 
@@ -50,6 +52,7 @@ class Device:
 		"""
 		if self.prevTime != None:
 			dt = abs(time - self.prevTime)
+			self.timeDifferences[dt] += 1
 			if dt > self.highDT or dt < self.lowDT:
 				if len(self.rawData[self.currIdx]) >= self.minSamples:
 					self.currIdx += 1
