@@ -4,6 +4,9 @@ import stepDetection
 # import matplotlib.pyplot as plt
 import numpy
 import dtw
+import random
+
+NUM_SAMPLES = 100
 
 class Device:
 	"""
@@ -103,10 +106,11 @@ class Device:
 		totalDistances = list()
 		devScores = dict()
 		precomputed = dict()
-		for idx1, cycle in enumerate(self.cycles):
+		samples = random.sample(self.cycles, NUM_SAMPLES)
+		for idx1, cycle in enumerate(samples):
 			devScores[idx1] = list()
 			distanceScore = 0.0
-			for idx2, toCompare in enumerate(self.cycles):
+			for idx2, toCompare in enumerate(samples):
 				if idx1 != idx2:
 					if (idx1, idx2) in precomputed:
 						indivScore, indivDev = precomputed[(idx1, idx2)]
