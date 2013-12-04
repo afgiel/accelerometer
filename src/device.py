@@ -112,14 +112,11 @@ class Device:
 				if idx not in allScores:
 					allScores[idx] = list()
 				allScores[idx].append(score)
-		for indexScore in allScores:
+		for idx in allScores:
+			indexScore = allScores[idx]
 			avgForIndex = numpy.mean(indexScore)
 			avgDevScore.append(avgForIndex)
 		self.averageDevScore = avgDevScore
-
-		
-
-
 
 	def averageCycles(self):
 		totalDistances = list()
