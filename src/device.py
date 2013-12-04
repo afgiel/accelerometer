@@ -9,6 +9,13 @@ import random
 
 NUM_SAMPLES = 100
 
+
+def getTimeDifference(dataList):
+	if len(dataList) == 0:
+		return 0
+	else:
+		return  dataList[len(dataList)-1][0] - dataList[0][0]
+
 class Device:
 	"""
 	Class that stores all the information to create a
@@ -20,7 +27,7 @@ class Device:
 
 	"""
 
-	def __init__(self, deviceID, lowDT = 1, highDT = 320, minSamples = 150):
+	def __init__(self, deviceID, lowDT = 0.0, highDT = 320, minSampleTime = 20000):
 		"""
 
 
@@ -31,11 +38,13 @@ class Device:
 		self.highDT = highDT
 		self.lowDT = lowDT
 		self.currIdx = 0
-		self.minSamples = minSamples
+		self.minSampleTime = minSampleTime
 		self.rawData = list()
 		self.rawData.append(list())
 		self.processedData = list()
 		self.timeDifferences = collections.Counter()
+
+	
 
 
 
@@ -56,8 +65,8 @@ class Device:
 		if self.prevTime != None:
 			dt = abs(time - self.prevTime)
 			self.timeDifferences[dt] += 1
-			if dt > self.highDT or dt < self.lowDT:
-				if len(self.rawData[self.currIdx]) >= self.minSamples:
+			if dt > self.highDT:
+				if getTimeDifference(self.rawData[self.currIdx]) >= self.minSampleTime:
 					self.currIdx += 1
 					self.rawData.append(list())
 				else:
@@ -74,7 +83,7 @@ class Device:
 		"""
 		#Takes care of edge case where the last sequence is not
 		#large enough to accurately create a template.
-		if len(self.rawData[self.currIdx]) < self.minSamples:
+		if getTimeDifference(self.rawData[self.currIdx]) < self.minSampleTime:
 			self.rawData.pop(self.currIdx)
 
 		for idx, seq in enumerate(self.rawData):
