@@ -28,7 +28,7 @@ class Device:
 
 	"""
 
-	def __init__(self, deviceID, lowDT = 0.0, highDT = 600, minSampleTime = 7000):
+	def __init__(self, deviceID, lowDT = 0.0, highDT = 300, minSampleTime = 20000):
 		"""
 
 
@@ -88,7 +88,7 @@ class Device:
 		#large enough to accurately create a template.
 		if getTimeDifference(self.rawData[self.currIdx]) < self.minSampleTime:
 			self.rawData.pop(self.currIdx)
-		
+
 		for idx, seq in enumerate(self.rawData):
 			self.processedData.append(preProcess.linearInterpolation(interval, seq))
 			preProcess.WeightedMovingAverage(self.processedData[idx], window)
