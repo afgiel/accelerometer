@@ -6,8 +6,9 @@ import numpy
 import collections
 import dtw
 import random
+import matplotlib.pyplot as plt
 
-NUM_SAMPLES = 10
+NUM_SAMPLES = 20
 
 
 def getTimeDifference(dataList):
@@ -138,6 +139,9 @@ class Device:
 			samples = self.cycles
 		else:
 			samples = random.sample(self.cycles, NUM_SAMPLES)
+		for sample in samples:
+			plt.plot([i for i in range(len(sample))], [x[1] for x in sample], color='orange')
+			# print [x[1] for x in sample], "\n\n\n\n------"
 		for idx1, cycle in enumerate(samples):
 			devScores[idx1] = list()
 			distanceScore = 0.0
@@ -154,7 +158,9 @@ class Device:
 			totalDistances.append((idx1, distanceScore))
 		if len(samples) != 0:	
 			choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
-			self.averageCycle = self.cycles[choiceIdx]
+			self.averageCycle = samples[choiceIdx]
+			plt.plot([i for i in range(len(self.averageCycle))], [x[1] for x in self.averageCycle], color='blue')
+			plt.show()
 			devAgainstAvg = devScores[choiceIdx]
 			self.averageDevAgainstTemplate(devAgainstAvg)
 		else:
