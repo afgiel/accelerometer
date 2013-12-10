@@ -1,8 +1,8 @@
 import shutil
 from os import listdir, path, mkdir
 
-PATH = "../data/device_templates/"
-DISC_BY = 1000
+PATH = "../data/sequence_templates/"
+DISC_BY = 100000
 
 for f in listdir(PATH):
 	if path.isfile(PATH + f):
@@ -19,4 +19,3 @@ for f in listdir(PATH):
 			print "Success moving" + f + " to " + dest
 		except:
 			print "Error moving " + f + " to " + dest
-		break
