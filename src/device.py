@@ -88,7 +88,7 @@ class Device:
 		#large enough to accurately create a template.
 		if getTimeDifference(self.rawData[self.currIdx]) < self.minSampleTime:
 			self.rawData.pop(self.currIdx)
-
+		
 		for idx, seq in enumerate(self.rawData):
 			self.processedData.append(preProcess.linearInterpolation(interval, seq))
 			preProcess.WeightedMovingAverage(self.processedData[idx], window)
@@ -139,8 +139,8 @@ class Device:
 			samples = self.cycles
 		else:
 			samples = random.sample(self.cycles, NUM_SAMPLES)
-		for sample in samples:
-			plt.plot([i for i in range(len(sample))], [x[1] for x in sample], color='orange')
+		# for sample in samples:
+			# plt.plot([i for i in range(len(sample))], [x[1] for x in sample], color='orange')
 			# print [x[1] for x in sample], "\n\n\n\n------"
 		for idx1, cycle in enumerate(samples):
 			devScores[idx1] = list()
