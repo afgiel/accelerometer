@@ -7,6 +7,7 @@ from os import listdir
 TEMPLATE_PATH = "../data/device_templates/"
 DEV_PATH = "../data/device_dev/"
 TRAIN_ERROR_PATH = "../data/train_error/"
+RAW_FILE = "../data/raw/train.csv"
 THRESHOLD_PERCENT = 1.05
 
 def getOneTemplate(path, templateFile):
@@ -20,9 +21,10 @@ def getOneTemplate(path, templateFile):
 def getAllTemplates():
 	allTemplates = dict()
 	for templateFile in listdir(TEMPLATE_PATH):
-		dID = int(f[2:len(f)-4])
-		template = getOneTemplate(TEMPLATE_PATH, templateFile)
-		allTemplates[dID] = template
+		if templateFile.startswith("d_"):
+			dID = int(templateFile[2:len(templateFile)-4])
+			template = getOneTemplate(TEMPLATE_PATH, templateFile)
+			allTemplates[dID] = template
 	return allTemplates
 
 def getAllDevices():
