@@ -4,7 +4,7 @@ import dtw
 import linRegress
 from os import listdir
 
-TEMPLATE_PATH = "..data/device_templates/"
+TEMPLATE_PATH = "../data/device_templates/"
 DEV_PATH = "../data/device_dev/"
 TRAIN_ERROR_PATH = "../data/train_error/"
 THRESHOLD_PERCENT = 1.05
@@ -29,7 +29,7 @@ def getAllDevices():
 	deviceList = list()
 	with open(RAW_FILE) as trainData:
 		next(trainData)
-		trainReader csv.reader(trainData)
+		trainReader = csv.reader(trainData)
 		lastIDRead = -1
 		deviceIndex = -1
 		for sample in trainReader:
