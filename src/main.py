@@ -23,6 +23,8 @@ DEV_DEV_PATH = "../data/device_dev/"
 interval = 100
 
 
+zeroCycleDevices = list()
+
 
 def extractTemplate(d, verbose, string):
 	if verbose:
@@ -38,6 +40,8 @@ def extractTemplate(d, verbose, string):
 		print
 		print "	", string, str(d.ID), "detected", len(d.cycles), "cycles"
 		print
+	if len(d.cycles) == 0:
+		zeroCycleDevices.append(d.ID)
 	if verbose:
 		print "	Averaging cycles from", string, str(d.ID) + "..."
 	d.averageCycles()
@@ -69,7 +73,6 @@ def createOneTemplate(filename, deviceID, toPlot, verbose):
 	if verbose:
 		print "Training template for Device", deviceID
 		print
-	deviceList = list()
 	with open(filename) as trainData:
 		next(trainData)
 		trainReader = csv.reader(trainData)
@@ -85,6 +88,30 @@ def createOneTemplate(filename, deviceID, toPlot, verbose):
 		extractTemplate(d, verbose, "Device")
 		print "Number of samples read for device", deviceID, ":", d.numSamples
 
+def createListsTemplate(filename, deviceIDList, toPlot, verbose):
+	if verbose:
+		print "Training templates"
+		print
+	with open(filename) as trainData:
+		next(trainData)
+		trainReader = csv.reader(trainData)
+		currentIDx = 0
+		print "* Reading device ", str(deviceIDList[currentIDx])+ "..."
+		d = device.Device(deviceIDList[currentIDx])
+		startedReading = False
+		for sample in trainReader:
+			if int(sample[4]) == deviceIDList[currentIDx]:
+				startedReading = True
+				d.addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
+			elif startedReading:
+				extractTemplate(d, verbose, "Device")
+				currentIDx += 1
+				if currentIDx == len(deviceIDList):
+					break
+				print "* Reading device ", str(deviceIDList[currentIDx])+ "..."
+				d = device.Device(deviceIDList[currentIDx])
+				startedReading = False
+				
 
 
 def createAllTemplates(filename, numDevices, toPlot, verbose):
@@ -117,6 +144,38 @@ def createAllTemplates(filename, numDevices, toPlot, verbose):
 
 	if toPlot:
 		deviceList[0].plotData()
+
+
+
+def createSequenceTemplateAfter(testFilename, numSequences, verbose):
+	if verbose:
+		print "Reading Test Sequences..."
+		print 
+	sequenceList = list()
+	with open(testFilename) as testData:
+		next(testData)
+		testReader = csv.reader(testData)
+		lastSIDRead = -1
+		sequenceIndex = -1
+		exceedNumSequencesFlag = False
+		for sample in testReader:
+			currentSequence = int(sample[4])
+			if int(sample[4]) > numSequences:
+				if currentSequence != lastSIDRead:
+					if lastSIDRead != -1:
+						extractTemplate(sequenceList[sequenceIndex], verbose, "Sequence")
+					# if (len(sequenceList)+ 1 > numSequences):
+					# 	exceedNumSequencesFlag = True
+					# 	break
+					if verbose:
+						print "* Reading sequence ", str(currentSequence)+ "..."
+					sequenceIndex += 1
+					sequenceList.append(device.Device(currentSequence))
+					lastSIDRead = currentSequence
+				sequenceList[sequenceIndex].addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
+		if not exceedNumSequencesFlag:
+			extractTemplate(sequenceList[sequenceIndex], verbose, "Sequence")
+
 
 def createSequenceTemplate(testFilename, numSequences, verbose):
 	if verbose:
@@ -160,11 +219,12 @@ def authenticate(questionFilename, numQuestions, verbose):
 		questionReader = csv.reader(questionData)
 		for question in questionReader:
 			qID, sID, dID = question
+			print qID, sID, dID
 			# if (len(questionList)+ 1 > numQuestions):
 			# 	break
 			if verbose:
 				print "	Reading device ", str(qID)+ "..."
-			questionList.append((qId, sID, dID))
+			questionList.append((qID, sID, dID))
 	answers = list()
 	for question in questionList:
 		prediction = authentication.authenticate(question)
@@ -178,8 +238,8 @@ def authenticate(questionFilename, numQuestions, verbose):
 
 # Test
 
-
-actions = ["train", "train1", "authenticate", "both"]
+authenticate("../data/raw/questions.csv", 10, True)
+actions = ["train", "train1", "trainList", "authenticate", "authenticateAfter", "both"]
 booleans = [True, False]
 parser = argparse.ArgumentParser(description = 'Process average gait cycle from accelerometer readings and authenticate user')
 parser.add_argument("action", help = "train, authenticate, both", default = "train", choices = actions)
@@ -195,9 +255,19 @@ args = parser.parse_args()
 
 if args.action == "train":
 	createAllTemplates(args.trainFile, args.numD, args.plot, args.verbose)
+	print zeroCycleDevices
 
 elif args.action == "train1":
 	createOneTemplate(args.trainFile, args.device, args.plot, args.verbose)
+
+elif args.action == "trainList":
+	devices = [261, 283, 344, 401, 425, 537, 553, 562, 634, 670, 730]
+	createListsTemplate(args.trainFile, devices, args.plot, args.verbose)
+	print zeroCycleDevices
+
+elif args.action == "authenticateAfter":
+	createSequenceTemplateAfter(args.testFile, 700000, args.verbose)
+
 elif args.action == "authenticate":
 	createSequenceTemplate(args.testFile, 90024, args.verbose)
 	authenticate("../data/questions.csv", 90024, args.verbose)

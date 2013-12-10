@@ -27,7 +27,7 @@ class Device:
 
 	"""
 
-	def __init__(self, deviceID, lowDT = 0.0, highDT = 320, minSampleTime = 25000):
+	def __init__(self, deviceID, lowDT = 0.0, highDT = 600, minSampleTime = 7000):
 		"""
 
 
@@ -154,7 +154,7 @@ class Device:
 			totalDistances.append((idx1, distanceScore))
 		if len(samples) != 0:	
 			choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
-			self.averageCycle = self.cycles[choiceIdx]
+			self.averageCycle = samples[choiceIdx]
 			devAgainstAvg = devScores[choiceIdx]
 			self.averageDevAgainstTemplate(devAgainstAvg)
 		else:
