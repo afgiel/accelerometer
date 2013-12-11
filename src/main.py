@@ -261,7 +261,7 @@ elif args.action == "train1":
 	createOneTemplate(args.trainFile, args.device, args.plot, args.verbose)
 
 elif args.action == "trainList":
-	devices = [261, 283, 344, 401, 425, 537, 553, 562, 634, 670, 730]
+	devices = [401, 537]
 	createListsTemplate(args.trainFile, devices, args.plot, args.verbose)
 	print zeroCycleDevices
 

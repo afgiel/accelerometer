@@ -28,7 +28,7 @@ class Device:
 
 	"""
 
-	def __init__(self, deviceID, lowDT = 0.0, highDT = 300, minSampleTime = 20000):
+	def __init__(self, deviceID, lowDT = 0.0, highDT = 600, minSampleTime = 7000):
 		"""
 
 
