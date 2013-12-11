@@ -1,5 +1,5 @@
 """
-Project: User Authentication With Gait Biometric
+Project: Authenticating Smart Phone Users via Accelerometer Readings
 Contributors: Andrew Giel, Jonathan NeCamp
 
 Overview:
