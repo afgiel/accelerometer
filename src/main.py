@@ -12,6 +12,7 @@ import stepDetection
 import device
 import argparse
 import authentication
+import selfTrainSelfTest
 
 RAW_DATA_PATH = "../data/raw/"
 SEQ_TEMP_PATH = "../data/sequence_templates/"
@@ -239,7 +240,7 @@ def authenticate(questionFilename, numQuestions, verbose):
 # Test
 
 #authenticate("../data/raw/questions.csv", 10, True)
-actions = ["train", "train1", "trainList", "authenticate", "authenticateAfter", "both"]
+actions = ["train", "train1", "trainList", "trainFromHalf", "testFromHalf", "authenticate", "authenticateAfter", "both"]
 booleans = [True, False]
 parser = argparse.ArgumentParser(description = 'Process average gait cycle from accelerometer readings and authenticate user')
 parser.add_argument("action", help = "train, authenticate, both", default = "train", choices = actions)
@@ -259,6 +260,12 @@ if args.action == "train":
 
 elif args.action == "train1":
 	createOneTemplate(args.trainFile, args.device, args.plot, args.verbose)
+
+elif args.action == 'trainFromHalf':
+	selfTrainSelfTest.trainFromHalf()
+
+elif args.action == "testFromHalf":
+	selfTrainSelfTest.testFromHalf()
 
 elif args.action == "trainList":
 	devices = [401, 537]
