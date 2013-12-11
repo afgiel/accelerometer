@@ -28,7 +28,7 @@ class Device:
 
 	"""
 
-	def __init__(self, deviceID, lowDT = 0.0, highDT = 600, minSampleTime = 7000):
+	def __init__(self, deviceID, lowDT = 0.0, highDT = 300, minSampleTime = 20000):
 		"""
 
 
@@ -139,8 +139,8 @@ class Device:
 			samples = self.cycles
 		else:
 			samples = random.sample(self.cycles, NUM_SAMPLES)
-		for sample in samples:
-			plt.plot([i for i in range(len(sample))], [x[1] for x in sample], color='orange')
+		# for sample in samples:
+			# plt.plot([i for i in range(len(sample))], [x[1] for x in sample], color='orange')
 			# print [x[1] for x in sample], "\n\n\n\n------"
 		for idx1, cycle in enumerate(samples):
 			devScores[idx1] = list()
@@ -159,11 +159,11 @@ class Device:
 		if len(samples) != 0:	
 			choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
 			self.averageCycle = samples[choiceIdx]
-<<<<<<< HEAD
-=======
-			plt.plot([i for i in range(len(self.averageCycle))], [x[1] for x in self.averageCycle], color='blue')
-			plt.show()
->>>>>>> 2fec8fd6d02e252dbf8059ae297881306bf5b6bb
+#<<<<<<< HEAD
+#=======
+#			plt.plot([i for i in range(len(self.averageCycle))], [x[1] for x in self.averageCycle], color='blue')
+#			plt.show()
+#>>>>>>> 2fec8fd6d02e252dbf8059ae297881306bf5b6bb
 			devAgainstAvg = devScores[choiceIdx]
 			self.averageDevAgainstTemplate(devAgainstAvg)
 		else:
