@@ -39,12 +39,11 @@ def getAllDevices():
 			if currentDevice != lastIDRead:
 				if lastIDRead != -1:
 					extractCycles(deviceList[deviceIndex])
-					break
 				deviceIndex += 1
 				deviceList.append(device.Device(currentDevice))
 				lastIDRead = currentDevice
 			deviceList[deviceIndex].addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
-	# extractCycles(deviceList[deviceIndex])
+	extractCycles(deviceList[deviceIndex])
 	return deviceList
 
 def extractCycles(d):
