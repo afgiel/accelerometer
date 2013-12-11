@@ -31,7 +31,7 @@ def authenticate(question):
 	deviceTemplate = getTemplate(dID, DEV_TEMP_PATH, "d_")
 	sequenceTemplate = getTemplate(sID, SEQ_TEMP_PATH, "s_")
 	avgDevelopmentScore = getTemplate(dID, DEV_DEV_PATH, "d_")
-	dtwScore, seqDev = dtw.getDTW2(deviceTemplate, sequenceTemplate)
+	dtwScore, seqDev = dtw.getDTW(deviceTemplate, sequenceTemplate)
 	avgDev = getLineForDev(avgDevelopmentScore)
 	seqDev = getLineForDev(seqDev)
 	plt.plot([i for i in range(len(deviceTemplate))], deviceTemplate, color='blue')

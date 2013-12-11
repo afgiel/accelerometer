@@ -150,7 +150,7 @@ class Device:
 					if (idx1, idx2) in precomputed:
 						indivScore, indivDev = precomputed[(idx1, idx2)]
 					else:
-						indivScore, indivDev = dtw.getDTW(cycle, toCompare)
+						indivScore, indivDev = dtw.getDTWTuple(cycle, toCompare)
 						precomputed[(idx1, idx2)] = (indivScore, indivDev)
 						precomputed[(idx2, idx1)] = (indivScore, indivDev)
 					distanceScore += indivScore

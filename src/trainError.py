@@ -82,7 +82,7 @@ def writeAllOutTrainError(truePos, trueNeg, falsePos, falseNeg):
 	fileToWrite.close()
 
 def makePrediction(dTemplate, toTest, avgDev):
-	disregard, testDev = dtw.getDTW2(dTemplate, toTest)
+	disregard, testDev = dtw.getDTW(dTemplate, toTest)
 	avgSlope = linRegress.getSlopeForDifference([i for i in range(len(avgDev))], avgDev)
 	testSlope = linRegress.getSlopeForDifference([i for i in range(len(testDev))], testDev)
 	return 1 if testSlope <= avgSlope*THRESHOLD_PERCENT else 0
