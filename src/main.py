@@ -238,7 +238,7 @@ def authenticate(questionFilename, numQuestions, verbose):
 
 # Test
 
-authenticate("../data/raw/questions.csv", 10, True)
+#authenticate("../data/raw/questions.csv", 10, True)
 actions = ["train", "train1", "trainList", "authenticate", "authenticateAfter", "both"]
 booleans = [True, False]
 parser = argparse.ArgumentParser(description = 'Process average gait cycle from accelerometer readings and authenticate user')

@@ -58,7 +58,6 @@ def getDTW(A, B):
 
 	devToReturn = []
 	for index in dev:
-		print index
 		devToReturn.append(DTW[index[0]][index[1]])
 		
 	return DTW[aLen-1][bLen-1], devToReturn
