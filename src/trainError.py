@@ -39,11 +39,12 @@ def getAllDevices():
 			if currentDevice != lastIDRead:
 				if lastIDRead != -1:
 					extractCycles(deviceList[deviceIndex])
+					break
 				deviceIndex += 1
 				deviceList.append(device.Device(currentDevice))
 				lastIDRead = currentDevice
 			deviceList[deviceIndex].addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
-	extractCycles(deviceList[deviceIndex])
+	# extractCycles(deviceList[deviceIndex])
 	return deviceList
 
 def extractCycles(d):
@@ -64,7 +65,7 @@ def getLineForDev(dev):
 	return toReturn
 
 def writeIndivOutTrainError(dID, truePos, trueNeg, falsePos, falseNeg):
-	total = truePos, trueNeg, falsePos, falseNeg
+	total = truePos + trueNeg + falsePos + falseNeg
 	fileToWrite = open(TRAIN_ERROR_PATH + "te_d_" + str(dID) + ".txt", "w+")
 	fileToWrite.write(str(truePos) + "," + str(float(truePos)/total) + "\n")
 	fileToWrite.write(str(trueNeg) + "," + str(float(trueNeg)/total) + "\n")
@@ -73,7 +74,7 @@ def writeIndivOutTrainError(dID, truePos, trueNeg, falsePos, falseNeg):
 	fileToWrite.close()
 
 def writeAllOutTrainError(truePos, trueNeg, falsePos, falseNeg):
-	total = truePos, trueNeg, falsePos, falseNeg
+	total = truePos + trueNeg + falsePos + falseNeg
 	fileToWrite = open(TRAIN_ERROR_PATH + "CUMULATIVE.txt", "w+")
 	fileToWrite.write(str(truePos) + "," + str(float(truePos)/total) + "\n")
 	fileToWrite.write(str(trueNeg) + "," + str(float(trueNeg)/total) + "\n")
@@ -92,19 +93,20 @@ def calculateTrainErrorForOne(device, templates):
 	dID = device.ID 
 	toTest = set()
 	dTemplate = templates[dID]
-	avgDevelopmentScore = getOneTemplate(DEV_PATH, "d_" + dID + ".txt")
+	avgDevelopmentScore = getOneTemplate(DEV_PATH, "d_" + str(dID) + ".txt")
 	avgDev = getLineForDev(avgDevelopmentScore)
-	for cycle in device.cycles:
-		toTest.add((cycle, 1))
+	for tupleCycle in device.cycles:
+		cycle = [x[1] for x in tupleCycle]
+		toTest.add((tuple(cycle), 1))
 	for otherDevice in templates:
 		if otherDevice != dID:
-			toTest.add((templates[otherDevice], 0))
+			toTest.add((tuple(templates[otherDevice]), 0))
 	truePos = 0
 	trueNeg = 0
 	falsePos = 0
 	falseNeg = 0
 	for test in toTest:
-		testAgainst = test[0]
+		testAgainst = list(test[0])
 		answer = test[1]
 		prediction = makePrediction(dTemplate, testAgainst, avgDev)
 		if prediction == answer:
