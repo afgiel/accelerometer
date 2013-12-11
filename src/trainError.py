@@ -91,13 +91,14 @@ def calculateTrainErrorForOne(device, templates):
 	print "	Calculating train error for device " + str(device.ID) + "..."	
 	dID = device.ID 
 	toTest = set()
-	dTemplate = device.averageCycle
+	dTemplate = templates[dID]
 	avgDevelopmentScore = getOneTemplate(DEV_PATH, "d_" + dID + ".txt")
 	avgDev = getLineForDev(avgDevelopmentScore)
 	for cycle in device.cycles:
 		toTest.add((cycle, 1))
 	for otherDevice in templates:
-		toTest.add((templates[otherDevice], 0))
+		if otherDevice != dID:
+			toTest.add((templates[otherDevice], 0))
 	truePos = 0
 	trueNeg = 0
 	falsePos = 0
