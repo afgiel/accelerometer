@@ -24,9 +24,12 @@ def calculateAUC(results):
 
 xData = []
 yData = []
-for threshold in testResults:
+testKeys = sorted(testResults.keys())
+for threshold in testKeys:
+	print threshold
 	results = testResults[threshold]
 	auc = calculateAUC(results)
+	print "\t", auc
 	xData.append(threshold)
 	yData.append(auc)
 
