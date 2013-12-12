@@ -21,6 +21,11 @@ DEVICE_DATA_PATH = "../data/device_data/"
 SEQ_TEMP_PATH = "../data/sequence_templates/"
 DEVICE_TEMPLATE_PATH = "../data/device_templates/"
 DEVICE_DEV_PATH = "../data/device_dev/"
+QUESTION_PATH = "../data/raw/questions.csv"
+SUBMISSION_PATH = "../data/submission.csv"
+SUBMISSION_HEADER = "QuestionID,IsTrue\n"
+
+
 INITIAL_HIGH_DT = 300
 D_HIGH_DT = 25
 
@@ -202,34 +207,38 @@ def createAllSequenceTemplates(verbose = True):
 			seqFileNamePath = os.path.join(dirPath, seqFileName)
 			createAndWriteTemplate(seqFileNamePath, tempPath, None, False)
 
+def createSequenceTemplatesFromFolder(folderNum, verbose = True):
+	if verbose:
+		print "Creating Test Sequence Templates..."
+		print 
+	dirPath = SEQ_DATA_PATH+str(folderNum)+"/"
+	tempPath = SEQ_TEMP_PATH+str(folderNum)+"/"
+	for seqFileName in os.listdir(dirPath):
+		seqFileNamePath = os.path.join(dirPath, seqFileName)
+		createAndWriteTemplate(seqFileNamePath, tempPath, None, False)
 
-def authenticate(questionFilename, numQuestions, verbose):
+
+def getCSVLine(qID, prediction):
+	return str(qID) + "," + str(prediction) + "\n"
+
+def authenticate(verbose):
 	if verbose:
 		print "Authenticating..."
 		print 
-		print "Reading Questions..."
+		print "Answering Questions..."
 		print 
-	questionList = list()
-	with open(questionFilename) as questionData:
-		next(questionData)
-		questionReader = csv.reader(questionData)
-		for question in questionReader:
-			qID, sID, dID = question
-			print qID, sID, dID
-			# if (len(questionList)+ 1 > numQuestions):
-			# 	break
-			if verbose:
-				print "	Reading device ", str(qID)+ "..."
-			questionList.append((qID, sID, dID))
-	answers = list()
-	for question in questionList:
-		prediction = authentication.authenticate(question)
-		answers.append((question[0], prediction))
-	with open("answers.crv", "w") as answerFile:
-		for answer in answers:
-			answerFile.write(str(answer[0]) + "," + str(answer[1]))
-
-
+	with open(QUESTION_PATH, "r") as questionFile:
+		with open(SUBMISSION_PATH, "w") as submissionFile:
+			next(questionFile)
+			submissionFile.write(SUBMISSION_HEADER)
+			questionReader = csv.reader(questionFile)
+			for question in questionReader:
+				qID, sID, dID = question
+				if verbose and int(qID)%1000 == 0 :
+					print "	Now answering question", str(qID) + "..."
+				prediction = authentication.authenticate(sID, dID)
+				submissionFile.write(getCSVLine(qID, prediction))
+			
 
 
 # Test
@@ -244,6 +253,7 @@ parser.add_argument("--createTestTemps", help = "If test templates need to be cr
 parser.add_argument("--numQuestions", help = "Number of questions to be asked to each device", type = int)
 parser.add_argument("--threshold", help = "Number of questions to be asked to each device", type = float)
 parser.add_argument("--justTotal", help = "Prints out just the total stats", action = 'store_true')
+parser.add_argument("--folderNum", help = "For create sequence templates, specifies folder to train from", type = int, default = None)
 args = parser.parse_args()
 
 
@@ -251,7 +261,11 @@ if args.action == "train":
 	createAllDeviceTemplates(args.verbose)
 
 elif args.action == "createSequenceTemplates":
-	createAllSequenceTemplates(args.verbose)
+	print args.folderNum
+	if args.folderNum == None:
+		createAllSequenceTemplates(args.verbose)
+	else:
+		createSequenceTemplatesFromFolder(args.folderNum, args.verbose)
 	print zeroTemplates
 
 elif args.action == "createOneSequenceTemplate":
@@ -265,11 +279,7 @@ elif args.action == "testFromHalf":
 	selfTrainSelfTest.testFromHalf(args.createTestTemps, args.threshold, args.numQuestions, args.justTotal)
 
 elif args.action == "authenticate":
-	createSequenceTemplate(args.testFile, 90024, args.verbose)
-	authenticate("../data/questions.csv", 90024, args.verbose)
-else:
-	createAllTemplates(args.trainFile, args.numD, args.plot, args.verbose)
-	authenticate("../data/questions.csv", 90024, args.verbose)
+	authenticate(args.verbose)
 
 if args.verbose:
 	print "All Done!"
