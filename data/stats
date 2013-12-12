@@ -1,0 +1,128 @@
+INITIAL_HIGH_DT = 300
+D_HIGH_DT = 100
+INITIAL_MIN_TIME = 20000
+MIN_TIME_FLOOR = 14001
+D_MIN_TIME = 2000
+NUM_QUESTIONS = 20
+CYCLE_THRESHOLD = 2
+
+------5 Questions --------------------
+
+Threshold: 1.05
+
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1112
+Accuracy: 57.4677002584 %
+True Positives: 269
+True Negatives: 843
+False Positives: 705
+False Negatives: 118
+
+Threshold: 1.03
+
+---TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1117
+Accuracy: 57.7260981912 %
+True Positives: 265
+True Negatives: 852
+False Positives: 696
+False Negatives: 122
+
+
+
+
+Threshold: 1.02
+
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1108
+Accuracy: 57.2609819121 %
+True Positives: 265
+True Negatives: 843
+False Positives: 705
+False Negatives: 122
+
+
+
+------- 20 questions --------------------
+
+Threshold: 1.03
+
+---TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4390
+Accuracy: 56.7183462532 %
+True Positives: 265
+True Negatives: 4125
+False Positives: 3228
+False Negatives: 122
+
+=============================================================================================
+
+---20 questions ---------
+Threshold 1.03
+ 
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4664
+Accuracy: 60.2583979328 %
+True Positives: 267
+True Negatives: 4397
+False Positives: 2956
+False Negatives: 120
+
+
+
+----5 Questions -------------
+Threshold 1.08
+
+Total Questions: 1935
+Total Correct: 1173
+Accuracy: 60.6201550388 %
+True Positives: 273
+True Negatives: 900
+False Positives: 648
+False Negatives: 114
+
+
+----2 questions ----------
+
+Threshold 1.10
+
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 512
+Accuracy: 66.149870801 %
+True Positives: 277
+True Negatives: 235
+False Positives: 152
+False Negatives: 110
+
+
+Threshold 1.20
+
+Total Questions: 774
+Total Correct: 503
+Accuracy: 64.9870801034 %
+True Positives: 290
+True Negatives: 213
+False Positives: 174
+False Negatives: 97
+
+
+Threshold 1.05
+
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 502
+Accuracy: 64.857881137 %
+True Positives: 267
+True Negatives: 235
+False Positives: 152
+False Negatives: 120
+
+
+
+

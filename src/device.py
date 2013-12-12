@@ -77,6 +77,7 @@ class Device:
 				
 			else: 
 				self.rawData[self.currIdx].append(preProcess.resultantAcceleration(time, x, y, z))
+
 		self.prevTime = time
 		
 
@@ -131,45 +132,48 @@ class Device:
 		self.averageDevScore = avgDevScore
 
 	def averageCycles(self):
-		totalDistances = list()
-		devScores = dict()
-		precomputed = dict()
-		samples = list()
-		if len(self.cycles) < NUM_SAMPLES:
-			samples = self.cycles
+		if len(self.cycles) == 1 :
+			self.averageCycle = self.cycles[0]
 		else:
-			samples = random.sample(self.cycles, NUM_SAMPLES)
-		# for sample in samples:
-			# plt.plot([i for i in range(len(sample))], [x[1] for x in sample], color='orange')
-			# print [x[1] for x in sample], "\n\n\n\n------"
-		for idx1, cycle in enumerate(samples):
-			devScores[idx1] = list()
-			distanceScore = 0.0
-			for idx2, toCompare in enumerate(samples):
-				if idx1 != idx2:
-					if (idx1, idx2) in precomputed:
-						indivScore, indivDev = precomputed[(idx1, idx2)]
-					else:
-						indivScore, indivDev = dtw.getDTWTuple(cycle, toCompare)
-						precomputed[(idx1, idx2)] = (indivScore, indivDev)
-						precomputed[(idx2, idx1)] = (indivScore, indivDev)
-					distanceScore += indivScore
-					devScores[idx1].append(indivDev)
-			totalDistances.append((idx1, distanceScore))
-		if len(samples) != 0:	
-			choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
-			self.averageCycle = samples[choiceIdx]
-#<<<<<<< HEAD
-#=======
-#			plt.plot([i for i in range(len(self.averageCycle))], [x[1] for x in self.averageCycle], color='blue')
-#			plt.show()
-#>>>>>>> 2fec8fd6d02e252dbf8059ae297881306bf5b6bb
-			devAgainstAvg = devScores[choiceIdx]
-			self.averageDevAgainstTemplate(devAgainstAvg)
-		else:
-			self.averageCycle = [(0, 0)]
-			self.averageDevAgainstTemplate =[(0,0)]
-			self.averageDevScore = 0
+			totalDistances = list()
+			devScores = dict()
+			precomputed = dict()
+			samples = list()
+			if len(self.cycles) < NUM_SAMPLES:
+				samples = self.cycles
+			else:
+				samples = random.sample(self.cycles, NUM_SAMPLES)
+			# for sample in samples:
+				# plt.plot([i for i in range(len(sample))], [x[1] for x in sample], color='orange')
+				# print [x[1] for x in sample], "\n\n\n\n------"
+			for idx1, cycle in enumerate(samples):
+				devScores[idx1] = list()
+				distanceScore = 0.0
+				for idx2, toCompare in enumerate(samples):
+					if idx1 != idx2:
+						if (idx1, idx2) in precomputed:
+							indivScore, indivDev = precomputed[(idx1, idx2)]
+						else:
+							indivScore, indivDev = dtw.getDTWTuple(cycle, toCompare)
+							precomputed[(idx1, idx2)] = (indivScore, indivDev)
+							precomputed[(idx2, idx1)] = (indivScore, indivDev)
+						distanceScore += indivScore
+						devScores[idx1].append(indivDev)
+				totalDistances.append((idx1, distanceScore))
+			if len(samples) != 0:	
+				choiceIdx, totalDistance = min(totalDistances, key=lambda x: x[1])
+				self.averageCycle = samples[choiceIdx]
+	#<<<<<<< HEAD
+	#=======
+	#			plt.plot([i for i in range(len(self.averageCycle))], [x[1] for x in self.averageCycle], color='blue')
+	#			plt.show()
+	#>>>>>>> 2fec8fd6d02e252dbf8059ae297881306bf5b6bb
+				devAgainstAvg = devScores[choiceIdx]
+				self.averageDevAgainstTemplate(devAgainstAvg)
+			else:
+				self.averageCycle = [(0, 0)]
+				self.averageDevAgainstTemplate =[(0,0)]
+				self.averageDevScore = 0
 
 
 	

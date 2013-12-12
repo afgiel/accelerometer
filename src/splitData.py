@@ -18,6 +18,7 @@ import csv
 
 RAW_TRAIN_DATA_PATH = "../data/raw/train.csv"
 RAW_TEST_DATA_PATH = "../data/raw/test.csv"
+DEVICE_DATA_PATH = "../data/device_data/"
 SEQUENCE_DATA_PATH = "../data/sequence_data/"
 TRAIN_DATA_PATH = "../data/train_data/"
 TEST_DATA_PATH = "../data/test_data/"
@@ -30,10 +31,34 @@ def createCSVLine(strTup):
 
 
 
+def splitDeviceTrainDataIntoSubfiles(rawDataFile, deviceDataPath):
+	print "Splitting Device training data into subfiles..."
+	def writeDeviceDataFile(ID, dataList):
+		with open(deviceDataPath + "d_" + str(ID) + ".csv", "w") as deviceFile:
+			deviceFile.write(str(ID) + "\n")
+			for sample in dataList:
+				deviceFile.write(createCSVLine(sample))
+
+	with open(rawDataFile) as data:
+		next(data)
+		dataReader = csv.reader(data)
+		currentDeviceDataList = list()
+		previousDevice = 7
+		for sample in dataReader:
+			if (previousDevice == int(sample[4])):
+				currentDeviceDataList.append(sample)
+			else:
+				writeDeviceDataFile(previousDevice, currentDeviceDataList)
+				currentDeviceDataList = list()
+				previousDevice = int(sample[4])
+				currentDeviceDataList.append(sample)
+
+		if len(currentDeviceDataList) > 0:
+			writeDeviceDataFile(previousDevice, currentDeviceDataList)
 
 
 def splitSequenceDataIntoSubFiles(rawDataFile, sequenceDataPath):
-
+	print "Splitting sequence data into subfiles..."
 	def writeSequenceDataFile(ID, dataList):
 		with open(sequenceDataPath + str(ID / SEQUENCE_BASE)+ "/" + "seq_" + str(ID) + ".csv", "w") as trainFile:
 			trainFile.write(str(ID) + "\n")
@@ -55,12 +80,12 @@ def splitSequenceDataIntoSubFiles(rawDataFile, sequenceDataPath):
 				previousSequenceID = int(sample[4])
 				currentSequenceDataList.append(sample)
 
-		if len(previousSequenceID) > 0:
-			writeTrainAndTestFiles(previousSequenceID, currentSequenceDataListd)
+		if len(currentSequenceDataList) > 0:
+			writeSequenceDataFile(previousSequenceID, currentSequenceDataList)
 
 
 def splitDataInHalf(rawDataFile, trainPath, testPath):
-
+	print "Splittin training data into training set and test set"
 	def writeTrainAndTestFiles(device, dataList):
 
 		splitPoint = len(dataList)/2
@@ -93,7 +118,7 @@ def splitDataInHalf(rawDataFile, trainPath, testPath):
 			writeTrainAndTestFiles(previousDevice, currentDeviceDataList)
 
 
-splitDataInHalf(RAW_TRAIN_DATA_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH)
-# splitSequenceDataIntoSubFiles(RAW_TEST_DATA_PATH, SEQUENCE_DATA_PATH)
-
+# splitDataInHalf(RAW_TRAIN_DATA_PATH, TRAIN_DATA_PATH, TEST_DATA_PATH)
+splitSequenceDataIntoSubFiles(RAW_TEST_DATA_PATH, SEQUENCE_DATA_PATH)
+# splitDeviceTrainDataIntoSubfiles(RAW_TRAIN_DATA_PATH, DEVICE_DATA_PATH)
 

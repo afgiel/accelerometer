@@ -13,199 +13,194 @@ import device
 import argparse
 import authentication
 import selfTrainSelfTest
+import os
 
 RAW_DATA_PATH = "../data/raw/"
+SEQ_DATA_PATH = "../data/sequence_data/"
+DEVICE_DATA_PATH = "../data/device_data/"
 SEQ_TEMP_PATH = "../data/sequence_templates/"
-DEV_TEMP_PATH = "../data/device_templates/"
-DEV_DEV_PATH = "../data/device_dev/"
+DEVICE_TEMPLATE_PATH = "../data/device_templates/"
+DEVICE_DEV_PATH = "../data/device_dev/"
+INITIAL_HIGH_DT = 300
+D_HIGH_DT = 25
 
-# Create template
+INITIAL_MIN_TIME = 30000
+D_MIN_TIME = 2000
 
-interval = 100
+CYCLE_THRESHOLD = 10
+D_CYCLE_THRESHOLD = 2
+
+THRESHOLD_PERCENT = 1.03
+
+CYCLE_THRESHOLD_IDX = 0
+MIN_TIME_IDX = 1
+HIGH_DT_IDX = 2
+
+CONSTRAINTS_IT_DICT_FOR_DEV = {
+	0: (CYCLE_THRESHOLD, INITIAL_MIN_TIME, INITIAL_HIGH_DT),
+	1: (CYCLE_THRESHOLD, INITIAL_MIN_TIME - D_MIN_TIME, INITIAL_HIGH_DT),
+	2: (CYCLE_THRESHOLD, INITIAL_MIN_TIME - 2*D_MIN_TIME, INITIAL_HIGH_DT),
+	3: (CYCLE_THRESHOLD, INITIAL_MIN_TIME - 3*D_MIN_TIME, INITIAL_HIGH_DT),
+	4: (CYCLE_THRESHOLD, INITIAL_MIN_TIME - 4*D_MIN_TIME, INITIAL_HIGH_DT),
+	5: (CYCLE_THRESHOLD - D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 5*D_MIN_TIME, INITIAL_HIGH_DT),
+	6: (CYCLE_THRESHOLD - D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 6*D_MIN_TIME, INITIAL_HIGH_DT + D_HIGH_DT),
+	7: (CYCLE_THRESHOLD - 2*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 7*D_MIN_TIME, INITIAL_HIGH_DT + 2*D_HIGH_DT),
+	8: (CYCLE_THRESHOLD - 2*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 8*D_MIN_TIME, INITIAL_HIGH_DT + 3*D_HIGH_DT),
+	9: (CYCLE_THRESHOLD - 3*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 9*D_MIN_TIME, INITIAL_HIGH_DT + 4*D_HIGH_DT),
+	10: (CYCLE_THRESHOLD- 3*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 10*D_MIN_TIME, INITIAL_HIGH_DT+ 5*D_HIGH_DT),
+	11: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 5*D_HIGH_DT),
+	12: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 6*D_HIGH_DT),
+	13: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 8*D_HIGH_DT),
+	14: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 10*D_HIGH_DT),
+	15: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 20*D_HIGH_DT),
+	16: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT + 30*D_HIGH_DT),
+	17: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT + 40*D_HIGH_DT),
+	18: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT + 1000*D_HIGH_DT)
+}
+
+CYCLE_THRESHOLD_FOR_SEQ = 1
+MIN_TIME_FOR_SEQ = 8000
+INITIAL_HIGH_DT_FOR_SEQ = 350
+D_HIGH_DT_FOR_SEQ = 50
+MAX_SEQ_ITERATIONS = 6
 
 
-zeroCycleDevices = list()
+CONSTRAINTS_IT_DICT_FOR_SEQ = {
+	0: (CYCLE_THRESHOLD_FOR_SEQ, MIN_TIME_FOR_SEQ, INITIAL_HIGH_DT_FOR_SEQ),
+	1: (CYCLE_THRESHOLD_FOR_SEQ, MIN_TIME_FOR_SEQ, INITIAL_HIGH_DT_FOR_SEQ + D_HIGH_DT_FOR_SEQ),
+	2: (CYCLE_THRESHOLD_FOR_SEQ, MIN_TIME_FOR_SEQ, INITIAL_HIGH_DT_FOR_SEQ + 3*D_HIGH_DT_FOR_SEQ),
+	3: (CYCLE_THRESHOLD_FOR_SEQ, MIN_TIME_FOR_SEQ, INITIAL_HIGH_DT_FOR_SEQ + 6*D_HIGH_DT_FOR_SEQ),
+	4: (CYCLE_THRESHOLD_FOR_SEQ, MIN_TIME_FOR_SEQ, INITIAL_HIGH_DT_FOR_SEQ + 10*D_HIGH_DT_FOR_SEQ),
+	5: (CYCLE_THRESHOLD_FOR_SEQ, MIN_TIME_FOR_SEQ, INITIAL_HIGH_DT_FOR_SEQ + 100*D_HIGH_DT_FOR_SEQ),
+	6: (CYCLE_THRESHOLD_FOR_SEQ, MIN_TIME_FOR_SEQ, INITIAL_HIGH_DT_FOR_SEQ + 1000*D_HIGH_DT_FOR_SEQ)
+
+}
 
 
-def extractTemplate(d, verbose, string):
+
+zeroTemplates = list()
+
+
+
+
+def extractTemplate(d, cycleThreshold, verbose = True):
 	if verbose:
 		print "	------Reading Complete------"
-		print "	Preprocessing data from", string, str(d.ID) + "..."
+		print "	Preprocessing data from Device", str(d.ID) + "..."
 	d.preProcessData()
 	if verbose:
 		print "	------Preprocessing Complete------"
-		print "	Detecting cycles from", string, str(d.ID) + "..."
+		print "	Detecting cycles from Device", str(d.ID) + "..."
 	d.detectCycles()			
 	if verbose:
 		print "	------Cycle Detection Complete------"
-		print
-		print "	", string, str(d.ID), "detected", len(d.cycles), "cycles"
-		print
-	if len(d.cycles) == 0:
-		zeroCycleDevices.append(d.ID)
+	if (len(d.cycles) < cycleThreshold):
+		if verbose:
+			print "	Only", len(d.cycles), "detected cycles" 
+			print "	Restarting average cycle detection with lower constraints"
+		return
 	if verbose:
-		print "	Averaging cycles from", string, str(d.ID) + "..."
+		print "	Detected ", len(d.cycles), "cycles"
+		print "	Averaging cycles from Device", str(d.ID) + "..."	
 	d.averageCycles()
 	if verbose:
-		print "	------Templates Created------"
-		print "	Writing template to file for", string, str(d.ID) + "..."
-	if string == "Sequence":
-		with open(SEQ_TEMP_PATH + "s_" + str(d.ID) + ".txt", "w") as templateFile:
-			toWrite = str([x[1] for x in d.averageCycle])
-			templateFile.write(toWrite)
-		if verbose:
-			print "	------Templates Written------"
-			print
-	else:
-		with open(DEV_TEMP_PATH + "d_" + str(d.ID) + ".txt", "w") as templateFile:
-			toWrite = str([x[1] for x in d.averageCycle])
-			templateFile.write(toWrite)					
-		if verbose:
-			print "	------Templates Written------"
-			print "	Writing develepment score to file for", string, str(d.ID) + "..."
-		with open(DEV_DEV_PATH + "d_" + str(d.ID) + ".txt", "w") as devFile:
-			toWrite = str(d.averageDevScore)
-			devFile.write(toWrite)
-		if verbose:
-			print "	------Development Score Written------"
-			print
+		print "	------Template Created------"
 
-def createOneTemplate(filename, deviceID, toPlot, verbose):
+
+def writeTemplateToFile(d, templatePath, isDevice, verbose = True):
+	prefix = "s_"
+	if isDevice:
+		prefix = "d_"
 	if verbose:
-		print "Training template for Device", deviceID
-		print
-	with open(filename) as trainData:
-		next(trainData)
-		trainReader = csv.reader(trainData)
-		d = device.Device(deviceID)
-		print "* Reading device ", str(deviceID)+ "..."
-		startedReading = False
-		for sample in trainReader:
-			if int(sample[4]) == deviceID:
-				startedReading = True
-				d.addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
-			elif startedReading:
-				break
-		extractTemplate(d, verbose, "Device")
-		print "Number of samples read for device", deviceID, ":", d.numSamples
-
-def createListsTemplate(filename, deviceIDList, toPlot, verbose):
+		print "	Writing template to file for Device", str(d.ID) + "..."
+	with open(templatePath + prefix + str(d.ID) + ".txt", "w") as templateFile:
+		toWrite = str([x[1] for x in d.averageCycle])
+		templateFile.write(toWrite)					
 	if verbose:
-		print "Training templates"
+		print "	------Template Written------"
+
+def writeZeroTemplate(d, templatePath, verbose = True):
+	if verbose:
+		print "	Writing template to file for Device", str(d.ID) + "..."
+	with open(templatePath + "s_" + str(d.ID) + ".txt", "w") as templateFile:
+		toWrite = str([0 for x in xrange(120)])
+		templateFile.write(toWrite)					
+	if verbose:
+		print "	------Template Written------"
+
+
+def writeDevToFile(d, devPath, verbose =True):
+	if verbose:
+		print "	Writing develepment score to file for Device", str(d.ID) + "..."
+	with open(devPath + "d_" + str(d.ID) + ".txt", "w") as devFile:
+		toWrite = str(d.averageDevScore)
+		devFile.write(toWrite)
+	if verbose:
+		print "	------Development Score Written------"
 		print
-	with open(filename) as trainData:
-		next(trainData)
-		trainReader = csv.reader(trainData)
-		currentIDx = 0
-		print "* Reading device ", str(deviceIDList[currentIDx])+ "..."
-		d = device.Device(deviceIDList[currentIDx])
-		startedReading = False
-		for sample in trainReader:
-			if int(sample[4]) == deviceIDList[currentIDx]:
-				startedReading = True
-				d.addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
-			elif startedReading:
-				extractTemplate(d, verbose, "Device")
-				currentIDx += 1
-				if currentIDx == len(deviceIDList):
-					break
-				print "* Reading device ", str(deviceIDList[currentIDx])+ "..."
-				d = device.Device(deviceIDList[currentIDx])
-				startedReading = False
-				
+
+def lowerConstraints(iteration, isDevice, verbose):
+	newConstraints = tuple()
+	if isDevice:
+		newConstraints = CONSTRAINTS_IT_DICT_FOR_DEV[iteration]
+	else: 
+		newConstraints = CONSTRAINTS_IT_DICT_FOR_SEQ[iteration]
+	if verbose:
+		print "		Lowering constraints to:"
+		print "			Minimum Time:", newConstraints[MIN_TIME_IDX]
+		print "			High Upper bound of dt:", newConstraints[HIGH_DT_IDX]
+		print "			Cycle Threshold:", newConstraints[CYCLE_THRESHOLD_IDX]
+	return newConstraints
+
+def createAndWriteTemplate(fileNamePath, templatePath, devPath, isDevice, verbose = True):
+	detectedCycles = 0
+	currentDevice = None
+	iteration = 0
+	cycleThreshold, minTime, highDT = lowerConstraints(iteration, isDevice, False)
+	while (detectedCycles < cycleThreshold):
+		if iteration != 0:
+			cycleThreshold, minTime, highDT = lowerConstraints(iteration, isDevice, verbose)
+		
+		with open(fileNamePath, "r") as deviceData:
+			currentDeviceID = int(next(deviceData))
+			print "	Reading from device", str(currentDeviceID) + "..."
+			deviceReader = csv.reader(deviceData)
+			currentDevice = device.Device(currentDeviceID, 0.0, highDT, minTime)
+			for sample in deviceReader:
+				currentDevice.addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
+		extractTemplate(currentDevice, cycleThreshold)
+		detectedCycles = len(currentDevice.cycles)
+		iteration += 1
+		if not isDevice:	
+			if iteration > MAX_SEQ_ITERATIONS:
+				zeroTemplates.append(currentDevice.ID)
+				writeZeroTemplate(currentDevice, templatePath)
+				return
+
+	writeTemplateToFile(currentDevice, templatePath, isDevice, True)
+	if isDevice:
+		writeDevToFile(currentDevice, devPath, True)
 
 
-def createAllTemplates(filename, numDevices, toPlot, verbose):
+def createAllDeviceTemplates(verbose = True):
 	if verbose:
 		print("Training templates...")
 		print
-	deviceList = list()
-	with open(filename) as trainData:
-		next(trainData)
-		trainReader = csv.reader(trainData)
-		lastIDRead = -1
-		deviceIndex = -1
-		exceedNumDevicesFlag = False
-		for sample in trainReader:
-			currentDevice = int(sample[4])
-			if currentDevice != lastIDRead:
-				if lastIDRead != -1:
-					extractTemplate(deviceList[deviceIndex], verbose, "Device")
-				if (len(deviceList)+ 1 > numDevices):
-					exceedNumDevicesFlag = True
-					break
-				if verbose:
-					print "* Reading device ", str(currentDevice)+ "..."
-				deviceIndex += 1
-				deviceList.append(device.Device(currentDevice))
-				lastIDRead = currentDevice
-			deviceList[deviceIndex].addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
-		if not exceedNumDevicesFlag:
-			extractTemplate(deviceList[deviceIndex], verbose, "Device")
-
-	if toPlot:
-		deviceList[0].plotData()
+	for deviceFileName in os.listdir(DEVICE_DATA_PATH):
+		deviceFileNamePath = os.path.join(DEVICE_DATA_PATH, deviceFileName)
+		createAndWriteTemplate(deviceFileNamePath, DEVICE_TEMPLATE_PATH, DEVICE_DEV_PATH, True)
 
 
-
-def createSequenceTemplateAfter(testFilename, numSequences, verbose):
+def createAllSequenceTemplates(verbose = True):
 	if verbose:
-		print "Reading Test Sequences..."
+		print "Creating Test Sequence Templates..."
 		print 
-	sequenceList = list()
-	with open(testFilename) as testData:
-		next(testData)
-		testReader = csv.reader(testData)
-		lastSIDRead = -1
-		sequenceIndex = -1
-		exceedNumSequencesFlag = False
-		for sample in testReader:
-			currentSequence = int(sample[4])
-			if int(sample[4]) > numSequences:
-				if currentSequence != lastSIDRead:
-					if lastSIDRead != -1:
-						extractTemplate(sequenceList[sequenceIndex], verbose, "Sequence")
-					# if (len(sequenceList)+ 1 > numSequences):
-					# 	exceedNumSequencesFlag = True
-					# 	break
-					if verbose:
-						print "* Reading sequence ", str(currentSequence)+ "..."
-					sequenceIndex += 1
-					sequenceList.append(device.Device(currentSequence))
-					lastSIDRead = currentSequence
-				sequenceList[sequenceIndex].addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
-		if not exceedNumSequencesFlag:
-			extractTemplate(sequenceList[sequenceIndex], verbose, "Sequence")
-
-
-def createSequenceTemplate(testFilename, numSequences, verbose):
-	if verbose:
-		print "Reading Test Sequences..."
-		print 
-	sequenceList = list()
-	with open(testFilename) as testData:
-		next(testData)
-		testReader = csv.reader(testData)
-		lastSIDRead = -1
-		sequenceIndex = -1
-		exceedNumSequencesFlag = False
-		for sample in testReader:
-			currentSequence = int(sample[4])
-			if currentSequence != lastSIDRead:
-				if lastSIDRead != -1:
-					extractTemplate(sequenceList[sequenceIndex], verbose, "Sequence")
-				if (len(sequenceList)+ 1 > numSequences):
-					exceedNumSequencesFlag = True
-					break
-				if verbose:
-					print "* Reading sequence ", str(currentSequence)+ "..."
-				sequenceIndex += 1
-				sequenceList.append(device.Device(currentSequence))
-				lastSIDRead = currentSequence
-			sequenceList[sequenceIndex].addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
-		if not exceedNumSequencesFlag:
-			extractTemplate(sequenceList[sequenceIndex], verbose, "Sequence")
-
+	for x in xrange(1, 10):
+		dirPath = SEQ_DATA_PATH+str(x)+"/"
+		tempPath = SEQ_TEMP_PATH+str(x)+"/"
+		for seqFileName in os.listdir(dirPath):
+			seqFileNamePath = os.path.join(dirPath, seqFileName)
+			createAndWriteTemplate(seqFileNamePath, tempPath, None, False)
 
 
 def authenticate(questionFilename, numQuestions, verbose):
@@ -240,40 +235,34 @@ def authenticate(questionFilename, numQuestions, verbose):
 # Test
 
 #authenticate("../data/raw/questions.csv", 10, True)
-actions = ["train", "train1", "trainList", "trainFromHalf", "testFromHalf", "authenticate", "authenticateAfter", "both"]
+actions = ["train","createSequenceTemplates","createOneSequenceTemplate", "trainFromHalf", "testFromHalf", "authenticate", "both"]
 booleans = [True, False]
 parser = argparse.ArgumentParser(description = 'Process average gait cycle from accelerometer readings and authenticate user')
 parser.add_argument("action", help = "train, authenticate, both", default = "train", choices = actions)
-parser.add_argument("--trainFile", help = "File where data to train authenticator is stored", default = "../data/raw/train.csv")
-parser.add_argument("--testFile", help = "File where data to create templates for tests is stored", default = "../data/raw/test.csv")
-parser.add_argument("--tempFile", help = "File where templates are stored")
-parser.add_argument("--numD", help = "Number of devices to create templates for", type = int, default = 400)
-parser.add_argument("--plot", help = "Boolean indicating whether data should be plotted", default = False, choices= booleans, type = bool)
-parser.add_argument("--verbose", help = "Prints out logging info when true", choices = booleans, default = True)
-parser.add_argument("--device", help = "Single device ID to create template for", type = int)
+parser.add_argument("--verbose", help = "Prints out logging info when true", action = 'store_true')
+parser.add_argument("--createTestTemps", help = "If test templates need to be created", action = 'store_true')
+parser.add_argument("--numQuestions", help = "Number of questions to be asked to each device", type = int)
+parser.add_argument("--threshold", help = "Number of questions to be asked to each device", type = float)
+parser.add_argument("--justTotal", help = "Prints out just the total stats", action = 'store_true')
 args = parser.parse_args()
 
 
 if args.action == "train":
-	createAllTemplates(args.trainFile, args.numD, args.plot, args.verbose)
-	print zeroCycleDevices
+	createAllDeviceTemplates(args.verbose)
 
-elif args.action == "train1":
-	createOneTemplate(args.trainFile, args.device, args.plot, args.verbose)
+elif args.action == "createSequenceTemplates":
+	createAllSequenceTemplates(args.verbose)
+	print zeroTemplates
+
+elif args.action == "createOneSequenceTemplate":
+	path = "../data/sequence_data/1/seq_100197.csv"
+	createAndWriteTemplate(path, None, None, False)
 
 elif args.action == 'trainFromHalf':
 	selfTrainSelfTest.trainFromHalf()
 
 elif args.action == "testFromHalf":
-	selfTrainSelfTest.testFromHalf()
-
-elif args.action == "trainList":
-	devices = [401, 537]
-	createListsTemplate(args.trainFile, devices, args.plot, args.verbose)
-	print zeroCycleDevices
-
-elif args.action == "authenticateAfter":
-	createSequenceTemplateAfter(args.testFile, 700000, args.verbose)
+	selfTrainSelfTest.testFromHalf(args.createTestTemps, args.threshold, args.numQuestions, args.justTotal)
 
 elif args.action == "authenticate":
 	createSequenceTemplate(args.testFile, 90024, args.verbose)

@@ -15,13 +15,15 @@ import random
 
 TRAIN_DATA_PATH = "../data/train_data/"
 TEST_DATA_PATH = "../data/test_data/"
+
+TEST_TEMPLATE_PATH = "../data/test_templates/"
 STATS = ["Total Questions", "Total Correct", "True Positives", "True Negatives" ,
 	"False Positives", "False Negatives"]
 ALL_DEVICES_KEY = -1
 
 
 def getRandomSample(source, numSamples, excludedDevice):
-	randomSample = random.sample(source, numSamples +1)
+	randomSample = random.sample(source, numSamples)
 	if excludedDevice in randomSample:
 		randomSample.remove(excludedDevice)
 	else:
@@ -54,7 +56,7 @@ class QuestionMaster:
 	"""
 
 
-	def __init__(self, deviceList, numQuestionsPerDevice = 5, testPath = TEST_DATA_PATH):
+	def __init__(self, deviceList, numQuestionsPerDevice = 5, testPath = TEST_TEMPLATE_PATH):
 		"""
 
 
@@ -64,7 +66,7 @@ class QuestionMaster:
 		self.testPath = testPath
 		self.deviceList = deviceList
 		self.stats = createStatsDict(self.deviceList)
-		self.correctResponse = getCorrectResponse(numQuestionsPerDevice)
+		self.correctResponse = getCorrectResponse(numQuestionsPerDevice) 
 
 
 
@@ -76,10 +78,10 @@ class QuestionMaster:
 
 		else:
 			questions = list()
-			questions.append(self.testPath + "test_" + str(device))
+			questions.append(self.testPath + "d_" + str(device) + ".txt")
 			randomSample = getRandomSample(self.deviceList, self.numQuestionsPerDevice, device)
 			for randomDevice in randomSample:
-				questions.append(self.testPath + "test_" + str(randomDevice))
+				questions.append(self.testPath + "d_" + str(randomDevice) + ".txt")
 			return questions
 
 	def answer(self, device, response):

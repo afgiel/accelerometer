@@ -1,0 +1,455 @@
+------------- 2 Questions ---------------
+
+Threshold Percent 1.00
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 501
+Accuracy: 64.7286821705 %
+True Positives: 263
+True Negatives: 238
+False Positives: 149
+False Negatives: 124
+
+Threshold Percent 1.01
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 481
+Accuracy: 62.1447028424 %
+True Positives: 265
+True Negatives: 216
+False Positives: 171
+False Negatives: 122
+
+Threshold Percent 1.02
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 490
+Accuracy: 63.3074935401 %
+True Positives: 266
+True Negatives: 224
+False Positives: 163
+False Negatives: 121
+
+Threshold Percent 1.03
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 490
+Accuracy: 63.3074935401 %
+True Positives: 267
+True Negatives: 223
+False Positives: 164
+False Negatives: 120
+
+Threshold Percent 1.05
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 503
+Accuracy: 64.9870801034 %
+True Positives: 267
+True Negatives: 236
+False Positives: 151
+False Negatives: 120
+
+Threshold Percent 1.08
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 508
+Accuracy: 65.6330749354 %
+True Positives: 273
+True Negatives: 235
+False Positives: 152
+False Negatives: 114
+
+Threshold Percent 1.10
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 503
+Accuracy: 64.9870801034 %
+True Positives: 277
+True Negatives: 226
+False Positives: 161
+False Negatives: 110
+
+Threshold Percent 1.20
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 495
+Accuracy: 63.9534883721 %
+True Positives: 290
+True Negatives: 205
+False Positives: 182
+False Negatives: 97
+
+Threshold Percent 1.35
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 487
+Accuracy: 62.9198966408 %
+True Positives: 303
+True Negatives: 184
+False Positives: 203
+False Negatives: 84
+
+Threshold Percent 1.50
+----TOTAL STATS----
+Total Questions: 774
+Total Correct: 491
+Accuracy: 63.4366925065 %
+True Positives: 313
+True Negatives: 178
+False Positives: 209
+False Negatives: 74
+
+------------- 5 Questions ---------------
+
+Threshold Percent 1.00
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1213
+Accuracy: 62.6873385013 %
+True Positives: 263
+True Negatives: 950
+False Positives: 598
+False Negatives: 124
+
+Threshold Percent 1.01
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1191
+Accuracy: 61.5503875969 %
+True Positives: 265
+True Negatives: 926
+False Positives: 622
+False Negatives: 122
+
+Threshold Percent 1.02
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1185
+Accuracy: 61.2403100775 %
+True Positives: 266
+True Negatives: 919
+False Positives: 629
+False Negatives: 121
+
+Threshold Percent 1.03
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1185
+Accuracy: 61.2403100775 %
+True Positives: 267
+True Negatives: 918
+False Positives: 630
+False Negatives: 120
+
+Threshold Percent 1.05
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1154
+Accuracy: 59.6382428941 %
+True Positives: 267
+True Negatives: 887
+False Positives: 661
+False Negatives: 120
+
+Threshold Percent 1.08
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1157
+Accuracy: 59.7932816537 %
+True Positives: 273
+True Negatives: 884
+False Positives: 664
+False Negatives: 114
+
+Threshold Percent 1.10
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1143
+Accuracy: 59.0697674419 %
+True Positives: 277
+True Negatives: 866
+False Positives: 682
+False Negatives: 110
+
+Threshold Percent 1.20
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1129
+Accuracy: 58.34625323 %
+True Positives: 290
+True Negatives: 839
+False Positives: 709
+False Negatives: 97
+
+Threshold Percent 1.35
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1080
+Accuracy: 55.8139534884 %
+True Positives: 303
+True Negatives: 777
+False Positives: 771
+False Negatives: 84
+
+Threshold Percent 1.50
+----TOTAL STATS----
+Total Questions: 1935
+Total Correct: 1025
+Accuracy: 52.9715762274 %
+True Positives: 313
+True Negatives: 712
+False Positives: 836
+False Negatives: 74
+
+------------- 10 Questions ---------------
+
+Threshold Percent 1.00
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2358
+Accuracy: 60.9302325581 %
+True Positives: 263
+True Negatives: 2095
+False Positives: 1388
+False Negatives: 124
+
+Threshold Percent 1.01
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2353
+Accuracy: 60.8010335917 %
+True Positives: 265
+True Negatives: 2088
+False Positives: 1395
+False Negatives: 122
+
+Threshold Percent 1.02
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2367
+Accuracy: 61.1627906977 %
+True Positives: 266
+True Negatives: 2101
+False Positives: 1382
+False Negatives: 121
+
+Threshold Percent 1.03
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2400
+Accuracy: 62.015503876 %
+True Positives: 267
+True Negatives: 2133
+False Positives: 1350
+False Negatives: 120
+
+Threshold Percent 1.04
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2292
+Accuracy: 59.2248062016 %
+True Positives: 267
+True Negatives: 2025
+False Positives: 1458
+False Negatives: 120
+
+Threshold Percent 1.05
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2325
+Accuracy: 60.0775193798 %
+True Positives: 267
+True Negatives: 2058
+False Positives: 1425
+False Negatives: 120
+
+Threshold Percent 1.08
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2279
+Accuracy: 58.8888888889 %
+True Positives: 273
+True Negatives: 2006
+False Positives: 1477
+False Negatives: 114
+
+Threshold Percent 1.10
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2287
+Accuracy: 59.0956072351 %
+True Positives: 277
+True Negatives: 2010
+False Positives: 1473
+False Negatives: 110
+
+Threshold Percent 1.20
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2139
+Accuracy: 55.2713178295 %
+True Positives: 290
+True Negatives: 1849
+False Positives: 1634
+False Negatives: 97
+
+Threshold Percent 1.35
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 2059
+Accuracy: 53.2041343669 %
+True Positives: 303
+True Negatives: 1756
+False Positives: 1727
+False Negatives: 84
+
+Threshold Percent 1.50
+----TOTAL STATS----
+Total Questions: 3870
+Total Correct: 1969
+Accuracy: 50.8785529716 %
+True Positives: 313
+True Negatives: 1656
+False Positives: 1827
+False Negatives: 74
+
+------------- 20 Questions ---------------
+
+Threshold Percent 1.00
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4688
+Accuracy: 60.5684754522 %
+True Positives: 263
+True Negatives: 4425
+False Positives: 2928
+False Negatives: 124
+
+Threshold Percent 1.01
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4691
+Accuracy: 60.6072351421 %
+True Positives: 265
+True Negatives: 4426
+False Positives: 2927
+False Negatives: 122
+
+Threshold Percent 1.02
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4657
+Accuracy: 60.1679586563 %
+True Positives: 266
+True Negatives: 4391
+False Positives: 2962
+False Negatives: 121
+
+Threshold Percent 1.03
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4698
+Accuracy: 60.6976744186 %
+True Positives: 267
+True Negatives: 4431
+False Positives: 2922
+False Negatives: 120
+
+Threshold Percent 1.05
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4586
+Accuracy: 59.2506459948 %
+True Positives: 267
+True Negatives: 4319
+False Positives: 3034
+False Negatives: 120
+
+Threshold Percent 1.08
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4605
+Accuracy: 59.496124031 %
+True Positives: 273
+True Negatives: 4332
+False Positives: 3021
+False Negatives: 114
+
+Threshold Percent 1.10
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4500
+Accuracy: 58.1395348837 %
+True Positives: 277
+True Negatives: 4223
+False Positives: 3130
+False Negatives: 110
+
+Threshold Percent 1.20
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4260
+Accuracy: 55.0387596899 %
+True Positives: 290
+True Negatives: 3970
+False Positives: 3383
+False Negatives: 97
+
+Threshold Percent 1.35
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 4029
+Accuracy: 52.0542635659 %
+True Positives: 303
+True Negatives: 3726
+False Positives: 3627
+False Negatives: 84
+
+Threshold Percent 1.50
+----TOTAL STATS----
+Total Questions: 7740
+Total Correct: 3756
+Accuracy: 48.5271317829 %
+True Positives: 313
+True Negatives: 3443
+False Positives: 3910
+False Negatives: 74
+
+------------- 50 Questions ---------------
+
+Threshold Percent 1.03
+----TOTAL STATS----
+Total Questions: 19350
+Total Correct: 11506
+Accuracy: 59.4625322997 %
+True Positives: 267
+True Negatives: 11239
+False Positives: 7724
+False Negatives: 120
+
+------------- 100 Questions ---------------
+
+Threshold Percent 1.03
+----TOTAL STATS----
+Total Questions: 38700
+Total Correct: 23070
+Accuracy: 59.6124031008 %
+True Positives: 267
+True Negatives: 22803
+False Positives: 15510
+False Negatives: 120
+
+------------- 200 Questions ---------------
+
+Threshold Percent 1.03
+----TOTAL STATS----
+Total Questions: 77400
+Total Correct: 46146
+Accuracy: 59.6201550388 %
+True Positives: 267
+True Negatives: 45879
+False Positives: 31134
+False Negatives: 120
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

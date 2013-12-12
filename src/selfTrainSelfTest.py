@@ -34,17 +34,49 @@ TRAIN_HALF_PATH = "../data/train_data/"
 TEST_HALF_PATH = "../data/test_data/"
 DEV_TEMP_FOR_HALF_PATH = "../data/device_templates_for_half_data/"
 DEV_DEV_FOR_HALF_PATH = "../data/device_dev_for_half_data/"
-INITIAL_HIGH_DT = 300
-D_HIGH_DT = 100
-INITIAL_MIN_TIME = 20000
-MIN_TIME_FLOOR = 14001
-D_MIN_TIME = 2000
-NUM_QUESTIONS = 5
-CYCLE_THRESHOLD = 2
+TEST_TEMPLATE_PATH = "../data/test_templates/"
+
+
 THRESHOLD_PERCENT = 1.05
+NUM_QUESTIONS = 2
+
+INITIAL_HIGH_DT = 300
+D_HIGH_DT = 25
+
+INITIAL_MIN_TIME = 30000
+D_MIN_TIME = 2000
+
+CYCLE_THRESHOLD = 10
+D_CYCLE_THRESHOLD = 2
 
 
-def extractTemplateForHalf(d, cycleThreshold = CYCLE_THRESHOLD, verbose = True):
+
+CYCLE_THRESHOLD_IDX = 0
+MIN_TIME_IDX = 1
+HIGH_DT_IDX = 2
+CONSTRAINTS_IT_DICT = {
+	1: (CYCLE_THRESHOLD, INITIAL_MIN_TIME - D_MIN_TIME, INITIAL_HIGH_DT),
+	2: (CYCLE_THRESHOLD, INITIAL_MIN_TIME - 2*D_MIN_TIME, INITIAL_HIGH_DT),
+	3: (CYCLE_THRESHOLD, INITIAL_MIN_TIME - 3*D_MIN_TIME, INITIAL_HIGH_DT),
+	4: (CYCLE_THRESHOLD, INITIAL_MIN_TIME - 4*D_MIN_TIME, INITIAL_HIGH_DT),
+	5: (CYCLE_THRESHOLD - D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 5*D_MIN_TIME, INITIAL_HIGH_DT),
+	6: (CYCLE_THRESHOLD - D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 6*D_MIN_TIME, INITIAL_HIGH_DT + D_HIGH_DT),
+	7: (CYCLE_THRESHOLD - 2*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 7*D_MIN_TIME, INITIAL_HIGH_DT + 2*D_HIGH_DT),
+	8: (CYCLE_THRESHOLD - 2*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 8*D_MIN_TIME, INITIAL_HIGH_DT + 3*D_HIGH_DT),
+	9: (CYCLE_THRESHOLD - 3*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 9*D_MIN_TIME, INITIAL_HIGH_DT + 4*D_HIGH_DT),
+	10: (CYCLE_THRESHOLD- 3*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 10*D_MIN_TIME, INITIAL_HIGH_DT+ 5*D_HIGH_DT),
+	11: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 5*D_HIGH_DT),
+	12: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 6*D_HIGH_DT),
+	13: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 8*D_HIGH_DT),
+	14: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 10*D_HIGH_DT),
+	15: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT+ 20*D_HIGH_DT),
+	16: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT + 30*D_HIGH_DT),
+	17: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT + 40*D_HIGH_DT),
+	18: (CYCLE_THRESHOLD- 4*D_CYCLE_THRESHOLD, INITIAL_MIN_TIME - 11*D_MIN_TIME, INITIAL_HIGH_DT + 1000*D_HIGH_DT)
+}
+
+
+def extractTemplateForHalf(d, cycleThreshold, verbose = True):
 	if verbose:
 		print "	------Reading Complete------"
 		print "	Preprocessing data from Device", str(d.ID) + "..."
@@ -68,16 +100,19 @@ def extractTemplateForHalf(d, cycleThreshold = CYCLE_THRESHOLD, verbose = True):
 		print "	------Template Created------"
 
 
-def writeTempAndDevToFile(d, verbose =True):
+def writeTemplateToFile(d, templatePath, verbose = True):
 	if verbose:
 		print "	Writing template to file for Device", str(d.ID) + "..."
-	with open(DEV_TEMP_FOR_HALF_PATH + "d_" + str(d.ID) + ".txt", "w") as templateFile:
+	with open(templatePath + "d_" + str(d.ID) + ".txt", "w") as templateFile:
 		toWrite = str([x[1] for x in d.averageCycle])
 		templateFile.write(toWrite)					
 	if verbose:
-		print "	------Templates Written------"
+		print "	------Template Written------"
+
+def writeDevToFile(d, devPath, verbose =True):
+	if verbose:
 		print "	Writing develepment score to file for Device", str(d.ID) + "..."
-	with open(DEV_DEV_FOR_HALF_PATH + "d_" + str(d.ID) + ".txt", "w") as devFile:
+	with open(devPath + "d_" + str(d.ID) + ".txt", "w") as devFile:
 		toWrite = str(d.averageDevScore)
 		devFile.write(toWrite)
 	if verbose:
@@ -85,9 +120,8 @@ def writeTempAndDevToFile(d, verbose =True):
 		print
 
 
-def getTemplateFromFile(ID, path , prefix = "d_"):
-	filename = path + prefix + str(ID) + ".txt"
-	with open(filename) as templateFile:
+def getTemplateFromFile(path):
+	with open(path) as templateFile:
 		templateStr = next(templateFile)
 	templateStr = templateStr[1:len(templateStr)-1]
 	template = templateStr.split(',')
@@ -103,66 +137,85 @@ def getLineForDev(dev):
 	return toReturn
 
 
+def lowerConstraints(iteration, verbose):
+	newConstraints = CONSTRAINTS_IT_DICT[iteration]
+	if verbose:
+		print "		Lowering constraints to:"
+		print "			Minimum Time:", newConstraints[MIN_TIME_IDX]
+		print "			High Upper bound of dt:", newConstraints[HIGH_DT_IDX]
+		print "			Cycle Threshold:", newConstraints[CYCLE_THRESHOLD_IDX]
+	return newConstraints
 
-def createAndWriteTemplate(fileNamePath, toWrite = True, cycleThreshold = CYCLE_THRESHOLD):
+def createAndWriteTemplate(fileNamePath, templatePath, devPath, isTrain, verbose = True):
+	cycleThreshold = CYCLE_THRESHOLD
 	minTime = INITIAL_MIN_TIME
 	highDT = INITIAL_HIGH_DT
 	detectedCycles = 0
 	currentDevice = None
+	iteration = 0
 	while (detectedCycles < cycleThreshold):
+		if iteration != 0:
+			cycleThreshold, minTime, highDT = lowerConstraints(iteration, verbose)
 		with open(fileNamePath, "r") as deviceData:
 			currentDeviceID = int(next(deviceData))
 			deviceReader = csv.reader(deviceData)
 			currentDevice = device.Device(currentDeviceID, 0.0, highDT, minTime)
 			for sample in deviceReader:
 				currentDevice.addSample(float(sample[0]), float(sample[1]), float(sample[2]), float(sample[3]))
-			extractTemplateForHalf(currentDevice, cycleThreshold, toWrite)
-			minTime -= D_MIN_TIME
-			if minTime < MIN_TIME_FLOOR:
-				highDT += D_HIGH_DT*10
-			detectedCycles = len(currentDevice.cycles)
-			if (detectedCycles < cycleThreshold):
-				if toWrite:
-					print "		Lowering constraints to:"
-					print "			Minimum Time:", minTime
-					print "			High Upper bound of dt:", highDT
-	if toWrite:
-		writeTempAndDevToFile(currentDevice)
-	return currentDevice.averageCycle
+		extractTemplateForHalf(currentDevice, cycleThreshold, verbose)
+		detectedCycles = len(currentDevice.cycles)
+		iteration += 1
+					
+	writeTemplateToFile(currentDevice, templatePath)
+	if isTrain:
+		writeDevToFile(currentDevice, devPath)
 
-def getQuestionTemplate(questionFile):
-	averageCycle = createAndWriteTemplate(questionFile, False)
-	return [x[1] for x in averageCycle]
+def getFilePath(deviceID, path):
+	return path + "d_" + str(deviceID) + ".txt"
 
-def authenticate(deviceID, questionFile):
-	deviceTemplate = getTemplateFromFile(deviceID, DEV_TEMP_FOR_HALF_PATH)
-	questionTemplate = getQuestionTemplate(questionFile)
-	avgDevelopmentScore = getTemplateFromFile(deviceID, DEV_DEV_FOR_HALF_PATH)
+def authenticate(deviceID, questionTemplateFile, thresholdPercent):
+	deviceTemplate = getTemplateFromFile(getFilePath(deviceID, DEV_TEMP_FOR_HALF_PATH))
+	questionTemplate = getTemplateFromFile(questionTemplateFile)
+	avgDevelopmentScore = getTemplateFromFile(getFilePath(deviceID, DEV_DEV_FOR_HALF_PATH))
 	dtwScore, seqDev = dtw.getDTW(deviceTemplate, questionTemplate)
 	avgDev = getLineForDev(avgDevelopmentScore)
 	seqDev = getLineForDev(seqDev)
 	avgSlope = linRegress.getSlopeForDifference([i for i in range(len(avgDev))], avgDev)
 	seqSlope = linRegress.getSlopeForDifference([i for i in range(len(seqDev))], seqDev)
-	return 1 if seqSlope <= avgSlope*THRESHOLD_PERCENT else 0
+	return 1 if seqSlope <= avgSlope*thresholdPercent else 0
 
 
 
 def trainFromHalf():
+	print "Training templates for devices..."
 	for fileName in os.listdir(TRAIN_HALF_PATH):
 		fileNamePath = os.path.join(TRAIN_HALF_PATH, fileName)
-		createAndWriteTemplate(fileNamePath)
+		createAndWriteTemplate(fileNamePath, DEV_TEMP_FOR_HALF_PATH, DEV_DEV_FOR_HALF_PATH, True)
 
 
 
-def testFromHalf():
-	qm = questionMaster.QuestionMaster(DEVICES_LIST, NUM_QUESTIONS)
+def createTestTemplates():
+	print "Creating templates of test data..."
+	for fileName in os.listdir(TEST_HALF_PATH):
+		fileNamePath = os.path.join(TEST_HALF_PATH, fileName)
+		createAndWriteTemplate(fileNamePath, TEST_TEMPLATE_PATH, None, False)
+	print "Test template creation complete!"
+
+def testFromHalf(notCreated, thresholdPercent, numQuestions, justTotal):
+	if notCreated:
+		createTestTemplates()
+
+
+	# print "Now questioning..."
+	qm = questionMaster.QuestionMaster(DEVICES_LIST, numQuestions)
 	for deviceID in DEVICES_LIST:
 		answers = list()
 		questions = qm.getQuestions(deviceID)
-		for questionFile in questions:
-			answers.append(authenticate(deviceID, questionFile))
+		for questionTemplateFile in questions:
+			answers.append(authenticate(deviceID, questionTemplateFile, thresholdPercent))
 		qm.answer(deviceID, answers)
-		qm.printStatsForDevice(deviceID)
+		if not justTotal:
+			qm.printStatsForDevice(deviceID)
 	qm.printTotalStats()
 
 
